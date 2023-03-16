@@ -1,4 +1,4 @@
-from SendCommunication import send_communication
+import SendCommunication
 
 if __name__ == '__main__':
-    send_communication.SendCommunication(None, None)
+    SendCommunication.SendCommunication(None, None)
