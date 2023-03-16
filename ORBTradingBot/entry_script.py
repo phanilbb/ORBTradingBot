@@ -10,8 +10,8 @@ trading_table = dynamodb.Table('Trading')
 
 optionList = ["NIFTY"]
 
-CE_ALLOWED_DAYS = [0, 1, 2, 3]
-PE_ALLOWED_DAYS = [0, 1, 2, 3]
+CE_ALLOWED_DAYS = [0, 1, 2, 3, 4]
+PE_ALLOWED_DAYS = [0, 1, 2, 3, 4]
 
 DB_ORDER_STATUS = {
     "INIT": "init",
