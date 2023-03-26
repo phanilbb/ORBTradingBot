@@ -105,4 +105,4 @@ def nextExpiryDate():
     days = (day - date.weekday() + 7) % 7
     # if not days:
     #     days = 7
-    return date + timedelta(days=days) + timedelta(days=-1)
+    return date + timedelta(days=days)
