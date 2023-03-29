@@ -17,7 +17,6 @@ def lambda_handler(event, context):
     if time_helper.is_within_trading_time():
         print("------------------ Trading Script Time ------------------")
         trading_script.run()
-
         print("------------------ Trading Script END ------------------")
 
     if time_helper.is_within_exit_time():

@@ -44,6 +44,20 @@ def run():
     checkExitOrder()
 
 
+def get_orb_targets(type, high, low):
+    if type == 'BUY':
+        target = high + 303
+        sl = low
+    else:
+        target = low - 300
+        sl = high
+
+    return {
+        'target': target,
+        'sl': sl
+    }
+
+
 def orbTargets():
     try:
 
@@ -52,6 +66,7 @@ def orbTargets():
             return
 
         instruments = get_instruments_filter_by_status(DB_ORDER_STATUS['INIT'])
+        instruments = sorted(instruments, key=lambda x: x['type'])
         if not instruments:
             print("No data to checkEntry")
             return
@@ -72,23 +87,11 @@ def orbTargets():
             orb_candle = historic_data[0]
             orb_high = orb_candle[2]
             orb_low = orb_candle[3]
-            orb_open = orb_candle[1]
-            orb_close = orb_candle[4]
+            targets = get_orb_targets(each_instrument['type'], orb_high, orb_low)
 
-            # oc = abs(orb_open - orb_close)
-            # upper_shadow = min(abs(orb_high - orb_close), abs(orb_high - orb_open))
-
-            # if oc < 2*upper_shadow:
-            #     print("Entry data created skipped for symbol {}".format(each_instrument['sk']))
-            #     exception_handling.send_message("Entry data creation skipped for symbol {}".format(each_instrument['sk']))
-            #     continue
-
-            target = float(orb_high) + 301
-            stoploss = float(orb_low)
-            stoploss2 = float(orb_high) - 50
-            each_instrument['entry_price'] = str(orb_high)
-            each_instrument['target'] = str(int(math.ceil(target)))
-            each_instrument['stop_loss'] = str(int(max(stoploss, stoploss)))
+            each_instrument['entry_price'] = str(orb_high) if each_instrument['type'] == 'BUY' else str(orb_low)
+            each_instrument['target'] = str(int(math.ceil(targets['target'])))
+            each_instrument['stop_loss'] = str(int(targets['sl']))
             each_instrument['status'] = DB_ORDER_STATUS['CREATED']
 
             trading_table.put_item(Item=each_instrument)
@@ -107,6 +110,7 @@ def placeEntryOrders():
             return
 
         instruments = get_instruments_filter_by_status(DB_ORDER_STATUS['CREATED'])
+        instruments = sorted(instruments, key=lambda x: x['type'])
         if not instruments:
             print("No data to placeEntryOrders")
             return
@@ -143,6 +147,7 @@ def placeEntryOrders():
 def checkEntryOrders():
     try:
         instruments = get_instruments_filter_by_status(DB_ORDER_STATUS['ENTRY_PLACED'])
+        instruments = sorted(instruments, key=lambda x: x['type'])
         if not instruments:
             print("No data to checkEntryOrders")
             return
@@ -163,6 +168,7 @@ def checkEntryOrders():
 def placeExitOrder():
     try:
         instruments = get_instruments_filter_by_symbols(active_position_symbols())
+        instruments = sorted(instruments, key=lambda x: x['type'])
         if not instruments:
             print("No data to placeExitOrder")
             return
@@ -225,6 +231,7 @@ def placeExitOrder():
 def checkExitOrder():
     try:
         instruments = get_instruments_filter_by_status(DB_ORDER_STATUS['TARGETS_PLACED'])
+        instruments = sorted(instruments, key=lambda x: x['type'])
         if not instruments:
             print("No data to checkTargetOrders")
             return
@@ -252,7 +259,7 @@ def checkExit():
     try:
 
         instruments = get_instruments_filter_by_symbols(active_position_symbols())
-
+        instruments = sorted(instruments, key=lambda x: x['type'])
         if not instruments:
             print("No data to checkExit")
             return

@@ -9,6 +9,7 @@ def run():
     global obj
     obj = angel_one.get_session()
     order_book = angel_one.order_book(obj)
+    order_book = sorted(order_book, key=lambda x: x['netqty'], reverse=True)
 
     for e in order_book:
         if e['orderstatus'] in checkStatus:
@@ -26,7 +27,7 @@ def run():
             qty = int(e['netqty'])
         elif isSellPosition(e):
             t = "BUY"
-            qty = int(e['netqty'])
+            qty = -int(e['netqty'])
 
         if qty:
             data = {
