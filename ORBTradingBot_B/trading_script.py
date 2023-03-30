@@ -174,6 +174,11 @@ def placeExitOrder():
             return
 
         for each_instrument in instruments:
+
+            # blocking this for hedge orders
+            if each_instrument['type'] == 'BUY':
+                continue
+
             target = float(each_instrument['target'])
             stoploss = float(each_instrument['stop_loss'])
 
@@ -237,6 +242,10 @@ def checkExitOrder():
             return
 
         for each_instrument in instruments:
+
+            # blocking this for hedge orders
+            if each_instrument['type'] == 'BUY':
+                continue
 
             target_id = each_instrument['target_id']
             if target_id and is_order_placed(target_id, "complete"):
