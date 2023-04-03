@@ -24,6 +24,8 @@ Current P/L : {p}
 
 '''
 
+STATUS_COMMUNICATION_ENABLE = False
+
 
 def lambda_handler(event, context):
     obj = angel_one.get_session()
@@ -34,7 +36,7 @@ def lambda_handler(event, context):
         qty = each['netqty']
         p = each['pnl']
 
-        if int(qty):
+        if int(qty) and STATUS_COMMUNICATION_ENABLE:
             message = STATUS_TEMPLATE.format(t=trade, q=qty, p=p)
             telegram_bot_sendtext(message)
 
