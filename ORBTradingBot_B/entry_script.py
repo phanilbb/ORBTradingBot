@@ -111,7 +111,7 @@ def getStrikePrice(instrument):
         'CE': strikeCE,
         'PE': strikePE,
         'CE_HEDGE': strikeCEhedge,
-        'PE_HeDGE': strikePEhedge
+        'PE_HEDGE': strikePEhedge
     }
     print(response)
     return response
