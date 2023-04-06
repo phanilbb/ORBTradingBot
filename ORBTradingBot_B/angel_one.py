@@ -1,4 +1,6 @@
 import json
+import time
+
 from boto3.dynamodb.conditions import Key, Attr
 import boto3
 from smartapi import SmartConnect
@@ -76,6 +78,7 @@ def historic_data(obj, token, fromdate, todate, interval):
     }
 
     try:
+        time.sleep(1)
         response = obj.getCandleData(historicParam)
         if not response['status']:
             print("Historic data api failed with status false")
@@ -86,7 +89,6 @@ def historic_data(obj, token, fromdate, todate, interval):
             return []
 
         print("Historic Response for token : {} is {}".format(str(token), json.dumps(response)))
-
         return response['data']
 
     except Exception as e:
