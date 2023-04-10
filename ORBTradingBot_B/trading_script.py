@@ -41,7 +41,6 @@ def run():
     placeEntryOrders()
     checkEntryOrders()
     placeExitOrder()
-    checkExitOrder()
 
 
 def get_orb_targets(type, high, low):
@@ -175,21 +174,16 @@ def placeExitOrder():
 
         for each_instrument in instruments:
 
-            # blocking this for hedge orders
-            if each_instrument['type'] == 'BUY':
-                continue
-
-            target = float(each_instrument['target'])
             stoploss = float(each_instrument['stop_loss'])
 
-            if not each_instrument['target_id'] and not each_instrument['stoploss_id']:
+            if not each_instrument['stoploss_id']:
                 instrument_data = {
                     'symbol': each_instrument['sk'],
                     'token': each_instrument['token'],
                     'quantity': each_instrument['qty']
                 }
 
-                orderId = angel_one.place_sl_limit_order(obj, 'SELL', instrument_data, stoploss)
+                orderId = angel_one.place_sl_limit_order(obj, 'BUY', instrument_data, stoploss)
 
                 update_orderbook(obj)
                 if orderId and (is_order_placed(orderId, 'trigger pending') or is_order_placed(orderId, 'complete')):
@@ -197,36 +191,6 @@ def placeExitOrder():
                     each_instrument['stoploss_id'] = orderId
                     trading_table.put_item(Item=each_instrument)
                     print("StopLoss order placed for symbol {}".format(each_instrument['sk']))
-
-            else:
-
-                ohlc = get_OHLC_data(each_instrument['token'], "3m")
-                close = ohlc['close']
-                print("LTP close for symbol {} is {}".format(each_instrument['sk'], str(close)))
-
-                orderId = each_instrument['target_id'] if each_instrument['target_id'] else each_instrument[
-                    'stoploss_id']
-
-                order_details = filter_order_by_id(order_book, orderId)
-
-                if not order_details:
-                    continue
-
-                is_stoploss_order = order_details[0]['variety'] == 'STOPLOSS'
-
-                if abs(close - stoploss) > abs(close - target) and is_stoploss_order:
-                    if angel_one.modify_sl_limit_order_to_limit_order(obj, order_details[0], target):
-                        each_instrument['stoploss_id'] = ''
-                        each_instrument['target_id'] = orderId
-                        trading_table.put_item(Item=each_instrument)
-                        print("StopLoss order modified to target order for symbol {}".format(each_instrument['sk']))
-
-                if abs(close - stoploss) < abs(close - target) and not is_stoploss_order:
-                    if angel_one.modify_limit_order_to_sl_limit_order(obj, order_details[0], stoploss):
-                        each_instrument['stoploss_id'] = orderId
-                        each_instrument['target_id'] = ''
-                        trading_table.put_item(Item=each_instrument)
-                        print("Target order modified to Stoploss order for symbol {}".format(each_instrument['sk']))
 
     except Exception as e:
         print("Exception in placeExitOrder {}".format(e))
@@ -387,7 +351,7 @@ def is_position_active(symbol):
 
 def active_position_symbols():
     pos = angel_one.get_positions(obj)
-    return [e['tradingsymbol'] for e in pos if int(e['netqty']) > 0]
+    return [e['tradingsymbol'] for e in pos if int(e['netqty']) < 0]
 
 
 def get_OHLC_data(token, time_interval):

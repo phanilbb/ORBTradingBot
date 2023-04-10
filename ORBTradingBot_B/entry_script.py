@@ -51,7 +51,7 @@ def populateOptionsData(optionList):
                     'pk': dynamo.get_dynamo_pk(),
                     'sk': ece['symbol'],
                     'token': ece['token'],
-                    'qty': str(50),
+                    'qty': str(100),
                     'status': DB_ORDER_STATUS['INIT'],
                     'entry_price': '',
                     'stop_loss': '',
@@ -89,8 +89,8 @@ def getStrikePrice(instrument):
                 diffCE = diff
                 strikeCE = str(int(float(e['stkPrc'])))
 
-        if 15 <= float(e['ceQt']['ltp']) <= 30:
-            diff = float(e['ceQt']['ltp']) - 15.0
+        if 10 <= float(e['ceQt']['ltp']) <= 30:
+            diff = float(e['ceQt']['ltp']) - 10.0
             if diff < diffCEhedge:
                 diffCEhedge = diff
                 strikeCEhedge = str(int(float(e['stkPrc'])))
@@ -101,8 +101,8 @@ def getStrikePrice(instrument):
                 diffPE = diff
                 strikePE = str(int(float(e['stkPrc'])))
 
-        if 15 <= float(e['peQt']['ltp']) <= 30:
-            diff = float(e['peQt']['ltp']) - 15.0
+        if 10 <= float(e['peQt']['ltp']) <= 30:
+            diff = float(e['peQt']['ltp']) - 10.0
             if diff < diffPEhedge:
                 diffPEhedge = diff
                 strikePEhedge = str(int(float(e['stkPrc'])))
