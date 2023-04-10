@@ -83,8 +83,8 @@ def getStrikePrice(instrument):
     strikeCEhedge = ''
     strikeCE = ''
     for e in data:
-        if 200 <= float(e['ceQt']['ltp']) <= 250:
-            diff = float(e['ceQt']['ltp']) - 200.0
+        if 250 <= float(e['ceQt']['ltp']) <= 300:
+            diff = float(e['ceQt']['ltp']) - 250.0
             if diff < diffCE:
                 diffCE = diff
                 strikeCE = str(int(float(e['stkPrc'])))
@@ -95,8 +95,8 @@ def getStrikePrice(instrument):
                 diffCEhedge = diff
                 strikeCEhedge = str(int(float(e['stkPrc'])))
 
-        if 200 <= float(e['peQt']['ltp']) <= 250:
-            diff = float(e['peQt']['ltp']) - 200.0
+        if 250 <= float(e['peQt']['ltp']) <= 300:
+            diff = float(e['peQt']['ltp']) - 250.0
             if diff < diffPE:
                 diffPE = diff
                 strikePE = str(int(float(e['stkPrc'])))
