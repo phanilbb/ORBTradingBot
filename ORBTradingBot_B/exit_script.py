@@ -9,7 +9,6 @@ def run():
     global obj
     obj = angel_one.get_session()
     order_book = angel_one.order_book(obj)
-    order_book = sorted(order_book, key=lambda x: x['netqty'], reverse=True)
 
     for e in order_book:
         if e['orderstatus'] in checkStatus:
@@ -17,6 +16,7 @@ def run():
         angel_one.cancel_order(obj, e['orderid'], e['variety'])
 
     pos = angel_one.get_positions(obj)
+    pos = sorted(pos, key=lambda x: x['netqty'], reverse=True)
 
     for e in pos:
 

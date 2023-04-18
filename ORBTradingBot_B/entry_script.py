@@ -12,7 +12,7 @@ trading_table = dynamodb.Table('Trading')
 optionList = ["NIFTY"]
 
 TRANSACTION_TYPE = 'SELL'
-HEDGE_ENABLE = True
+HEDGE_ENABLE = False
 
 CE_ALLOWED_DAYS = [0, 1, 2, 3]
 PE_ALLOWED_DAYS = [0, 1, 2, 3]
