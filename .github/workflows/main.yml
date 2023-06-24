@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        folder: [ ORBTradingBot, SendCommunication, StatusCommunication, ORBTradingBot_B ]
+        folder: [ ORBTradingBot, SendCommunication, StatusCommunication, ORBTradingBot_B, TradingViewScrapping ]
     steps:
       - name: checkout source code
         uses: actions/checkout@v1
