@@ -51,6 +51,7 @@ def lambda_handler(event, context):
             print("Stochastic K value for trade {trade} is {value}".format(trade=each_data['symbol'], value=k_value))
             print("Stochastic K prev value for trade {trade} is {value}".format(trade=each_data['symbol'],
                                                                                 value=k_value_prev))
+            print("Last data : " + str(historic_data[len(historic_data) - 1]))
 
             if k_value_prev <= 20 and k_value > 20 and ema_1 < closes[len(closes) - 1] < ema_2:
                 print("Buy entry found for trade : {trade}".format(trade=each_data['symbol']))
