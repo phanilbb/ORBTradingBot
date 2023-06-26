@@ -48,7 +48,7 @@ def create_session():
     obj = SmartConnect(api_key=historical_apis['api_key'], access_token=historical_apis['secret_key'])
     totp = pyotp.TOTP('M3SAGK57IJCJIB5GH5NFG7DITI')
     data = obj.generateSession('L128041', '1703', str(totp.now()))
-    #set_session_data(data['data'])
+    set_session_data(data['data'])
     print("new session generated : {}".format(json.dumps(data)))
     return obj
 

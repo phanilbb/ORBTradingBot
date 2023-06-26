@@ -26,7 +26,7 @@ def lambda_handler(event, context):
     print("Drom date : {date}".format(date=fromdate))
     print("To date : {date}".format(date=todate))
 
-    obj = angel_one.create_session()
+    obj = angel_one.get_session()
     f = open("trades.json")
     data = json.load(f)
 
@@ -36,6 +36,7 @@ def lambda_handler(event, context):
         #     continue
 
         try:
+            print("________________________________________")
             print("check for trade : " + each_data['symbol'])
 
             historic_data = angel_one.historic_data(obj, each_data['token'], fromdate, todate, "30m")
@@ -72,7 +73,7 @@ def lambda_handler(event, context):
         except Exception as e:
             print("Exception for trade {trade} : {e}".format(trade=each_data['symbol'], e=e))
 
-        time.sleep(0.5)
+        time.sleep(0.35)
 
 
 def calculate_ema(data, period):
