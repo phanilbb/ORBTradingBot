@@ -19,17 +19,20 @@ def send_message(bot_message):
 
 
 def lambda_handler(event, context):
-    obj = angel_one.create_session()
     current_time = time_helper.get_current_time_with_delta(-5)
     fromdate = time_helper.get_date_with_delta(-15) + " 09:15"
     todate = time_helper.get_date_with_delta(0) + " " + current_time
 
+    print("Drom date : {date}".format(date=fromdate))
+    print("To date : {date}".format(date=todate))
+
+    obj = angel_one.create_session()
     f = open("trades.json")
     data = json.load(f)
 
     for each_data in data:
 
-        # if each_data['symbol'] != 'IRCTC-EQ':
+        # if each_data['symbol'] != 'ZEEL-EQ':
         #     continue
 
         try:
@@ -39,26 +42,31 @@ def lambda_handler(event, context):
             closes = [e[4] for e in historic_data]
             ema_50 = calculate_ema(closes, 50)
             ema_200 = calculate_ema(closes, 200)
-            rsi, k1, d1 = StochRSI(pd.Series(closes))
-            k_value = pd.Series.tolist(k1)[len(pd.Series.tolist(k1)) - 1] * 100
-            k_value_prev = pd.Series.tolist(k1)[len(pd.Series.tolist(k1)) - 2] * 100
+            rsi, k1, d1 = stoch_rsi_tradingview(pd.Series(closes))
+            k_value = pd.Series.tolist(k1)[len(pd.Series.tolist(k1)) - 1]
+            k_value_prev = pd.Series.tolist(k1)[len(pd.Series.tolist(k1)) - 2]
 
             ema_1 = ema_50[len(ema_50) - 1]
             ema_2 = ema_200[len(ema_200) - 1]
-            print(
-                "EMA 50 for trade {trade} is {value}".format(trade=each_data['symbol'], value=ema_1))
+            print("EMA 50 for trade {trade} is {value}".format(trade=each_data['symbol'], value=ema_1))
             print("EMA 200 for trade {trade} is {value}".format(trade=each_data['symbol'], value=ema_2))
             print("Stochastic K value for trade {trade} is {value}".format(trade=each_data['symbol'], value=k_value))
             print("Stochastic K prev value for trade {trade} is {value}".format(trade=each_data['symbol'],
                                                                                 value=k_value_prev))
             print("Last data : " + str(historic_data[len(historic_data) - 1]))
 
-            if k_value_prev <= 20 and k_value > 20 and ema_1 < closes[len(closes) - 1] < ema_2:
+            if k_value_prev <= 20 and k_value > 20 and ema_1 > closes[len(closes) - 1] > ema_2:
+                print("Strong Buy entry found for trade : {trade}".format(trade=each_data['symbol']))
+                send_message("Strong Buy entry found for trade : {trade}".format(trade=each_data['symbol']))
+            elif k_value_prev >= 80 and k_value < 80 and ema_1 < closes[len(closes) - 1] < ema_2:
+                print("Strong sell entry found for trade : {trade}".format(trade=each_data['symbol']))
+                send_message("Strong sell entry found for trade : {trade}".format(trade=each_data['symbol']))
+            elif k_value_prev <= 20 and k_value > 20 and ema_1 > ema_2:
                 print("Buy entry found for trade : {trade}".format(trade=each_data['symbol']))
                 send_message("Buy entry found for trade : {trade}".format(trade=each_data['symbol']))
-            elif k_value_prev >= 80 and k_value < 80 and ema_1 > closes[len(closes) - 1] > ema_2:
-                print("sell entry found for trade : {trade}".format(trade=each_data['symbol']))
-                send_message("sell entry found for trade : {trade}".format(trade=each_data['symbol']))
+            elif k_value_prev >= 80 and k_value < 80 and ema_1 < ema_2:
+                print("Sell entry found for trade : {trade}".format(trade=each_data['symbol']))
+                send_message("Sell entry found for trade : {trade}".format(trade=each_data['symbol']))
             else:
                 print("NO entry found for trade : {trade}".format(trade=each_data['symbol']))
         except Exception as e:
@@ -84,66 +92,31 @@ def calculate_ema(data, period):
     return ema_values
 
 
-def RSI(series, period=14):
-    delta = series.diff().dropna()
-    ups = delta * 0
-    downs = ups.copy()
-    ups[delta > 0] = delta[delta > 0]
-    downs[delta < 0] = -delta[delta < 0]
-    ups[ups.index[period - 1]] = np.mean(ups[:period])  # first value is sum of avg gains
-    ups = ups.drop(ups.index[:(period - 1)])
-    downs[downs.index[period - 1]] = np.mean(downs[:period])  # first value is sum of avg losses
-    downs = downs.drop(downs.index[:(period - 1)])
-    rs = ups.ewm(com=period - 1, min_periods=0, adjust=False, ignore_na=False).mean() / \
-         downs.ewm(com=period - 1, min_periods=0, adjust=False, ignore_na=False).mean()
-    return 100 - 100 / (1 + rs)
-
-
-# calculating Stoch RSI (gives the same values as TradingView)
-# https://www.tradingview.com/wiki/Stochastic_RSI_(STOCH_RSI)
-def StochRSI(series, period=14, smoothK=3, smoothD=3):
+def stoch_rsi_tradingview(series, period=14, smoothK=3, smoothD=3):
     # Calculate RSI
-    delta = series.diff().dropna()
-    ups = delta * 0
-    downs = ups.copy()
-    ups[delta > 0] = delta[delta > 0]
-    downs[delta < 0] = -delta[delta < 0]
-    ups[ups.index[period - 1]] = np.mean(ups[:period])  # first value is sum of avg gains
-    ups = ups.drop(ups.index[:(period - 1)])
-    downs[downs.index[period - 1]] = np.mean(downs[:period])  # first value is sum of avg losses
-    downs = downs.drop(downs.index[:(period - 1)])
-    rs = ups.ewm(com=period - 1, min_periods=0, adjust=False, ignore_na=False).mean() / \
-         downs.ewm(com=period - 1, min_periods=0, adjust=False, ignore_na=False).mean()
-    rsi = 100 - 100 / (1 + rs)
+    rsi = rsi_tradingview(series, period=period, round_rsi=False)
 
     # Calculate StochRSI
+    rsi = pd.Series(rsi)
     stochrsi = (rsi - rsi.rolling(period).min()) / (rsi.rolling(period).max() - rsi.rolling(period).min())
     stochrsi_K = stochrsi.rolling(smoothK).mean()
     stochrsi_D = stochrsi_K.rolling(smoothD).mean()
 
-    return stochrsi, stochrsi_K, stochrsi_D
+    return round(rsi, 2), round(stochrsi_K * 100, 2), round(stochrsi_D * 100, 2)
 
 
-# calculating Stoch RSI
-#  -- Same as the above function but uses EMA, not SMA
-def StochRSI_EMA(series, period=14, smoothK=3, smoothD=3):
-    # Calculate RSI
-    delta = series.diff().dropna()
-    ups = delta * 0
-    downs = ups.copy()
-    ups[delta > 0] = delta[delta > 0]
-    downs[delta < 0] = -delta[delta < 0]
-    ups[ups.index[period - 1]] = np.mean(ups[:period])  # first value is sum of avg gains
-    ups = ups.drop(ups.index[:(period - 1)])
-    downs[downs.index[period - 1]] = np.mean(downs[:period])  # first value is sum of avg losses
-    downs = downs.drop(downs.index[:(period - 1)])
-    rs = ups.ewm(com=period - 1, min_periods=0, adjust=False, ignore_na=False).mean() / \
-         downs.ewm(com=period - 1, min_periods=0, adjust=False, ignore_na=False).mean()
-    rsi = 100 - 100 / (1 + rs)
+def rsi_tradingview(series, period: int = 14, round_rsi: bool = True):
+    delta = series.diff()
 
-    # Calculate StochRSI
-    stochrsi = (rsi - rsi.rolling(period).min()) / (rsi.rolling(period).max() - rsi.rolling(period).min())
-    stochrsi_K = stochrsi.ewm(span=smoothK).mean()
-    stochrsi_D = stochrsi_K.ewm(span=smoothD).mean()
+    up = delta.copy()
+    up[up < 0] = 0
+    up = pd.Series.ewm(up, alpha=1 / period).mean()
 
-    return stochrsi, stochrsi_K, stochrsi_D
+    down = delta.copy()
+    down[down > 0] = 0
+    down *= -1
+    down = pd.Series.ewm(down, alpha=1 / period).mean()
+
+    rsi = np.where(up == 0, 0, np.where(down == 0, 100, 100 - (100 / (1 + up / down))))
+
+    return np.round(rsi, 2) if round_rsi else rsi
