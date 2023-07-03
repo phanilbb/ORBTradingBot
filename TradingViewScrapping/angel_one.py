@@ -20,7 +20,8 @@ EXCHANGE_TYPE = "NSE"
 INTERVAL = {
     '3m': "THREE_MINUTE",
     '30m': 'THIRTY_MINUTE',
-    '15m': 'FIFTEEN_MINUTE'
+    '15m': 'FIFTEEN_MINUTE',
+    '1h': 'ONE_HOUR'
 }
 
 dynamodb = boto3.resource("dynamodb", region_name='ap-south-1')
