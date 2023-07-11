@@ -72,6 +72,32 @@ def get_session():
     return obj
 
 
+def historic_data_2hr(data):
+    hr2_data = []
+
+    i = 0
+
+    while i < len(data):
+        curr = data[i]
+        if i + 1 < len(data):
+            next_curr = data[i + 1]
+            if curr[0].split('T')[0] == next_curr[0].split('T')[0]:
+                hr2_data.append(
+                    [curr[0], curr[1], max(curr[2], next_curr[2]), min(curr[3], next_curr[3]), next_curr[4],
+                     curr[5] + next_curr[5]])
+            else:
+                hr2_data.append(curr)
+                i = i + 1
+                continue
+        else:
+            hr2_data.append(curr)
+            i = i + 1
+            continue
+
+        i = i + 2
+    return hr2_data
+
+
 def historic_data(obj, token, fromdate, todate, interval):
     historicParam = {
         "exchange": EXCHANGE_TYPE,

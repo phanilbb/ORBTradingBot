@@ -21,7 +21,7 @@ def send_message(bot_message):
 
 def lambda_handler(event, context):
     current_time = time_helper.get_current_time_with_delta(-5)
-    fromdate = time_helper.get_date_with_delta(-25) + " 09:15"
+    fromdate = time_helper.get_date_with_delta(-60) + " 09:15"
     todate = time_helper.get_date_with_delta(0) + " " + current_time
 
     print("From date : {date}".format(date=fromdate))
@@ -46,44 +46,99 @@ def lambda_handler(event, context):
 
             historic_data_1hr = angel_one.historic_data(obj, each_data['token'], fromdate, todate, "1h")
             historic_data_30m = angel_one.historic_data(obj, each_data['token'], fromdate, todate, "30m")
-            historic_data_15m = angel_one.historic_data(obj, each_data['token'], fromdate, todate, "15m")
+            historic_data_2hr = angel_one.historic_data_2hr(
+                angel_one.historic_data(obj, each_data['token'], fromdate, todate, "1h"))
 
             t2 = datetime.now()
 
             closes['1hr'] = [e[4] for e in historic_data_1hr]
             closes['30m'] = [e[4] for e in historic_data_30m]
-            closes['15m'] = [e[4] for e in historic_data_15m]
+            closes['2hr'] = [e[4] for e in historic_data_2hr]
 
             ema_50['1hr'] = calculate_ema(closes['1hr'], 50)
             ema_50['30m'] = calculate_ema(closes['30m'], 50)
-            ema_50['15m'] = calculate_ema(closes['15m'], 50)
+            ema_50['2hr'] = calculate_ema(closes['2hr'], 50)
 
             ema_200['1hr'] = calculate_ema(closes['1hr'], 200)
             ema_200['30m'] = calculate_ema(closes['30m'], 200)
-            ema_200['15m'] = calculate_ema(closes['15m'], 200)
+            ema_200['2hr'] = calculate_ema(closes['2hr'], 200)
 
             rsi_1hr, k1_1hr, d1_1hr = stoch_rsi_tradingview(pd.Series(closes['1hr']))
             rsi_30m, k1_30m, d1_30m = stoch_rsi_tradingview(pd.Series(closes['30m']))
-            rsi_15m, k1_15m, d1_15m = stoch_rsi_tradingview(pd.Series(closes['15m']))
+            rsi_2hr, k1_2hr, d1_2hr = stoch_rsi_tradingview(pd.Series(closes['2hr']))
 
             k_values['1hr'] = k1_1hr
             k_values['30m'] = k1_30m
-            k_values['15m'] = k1_15m
+            k_values['2hr'] = k1_2hr
 
-            condition_1hr, type_1hr = check_1hr_condition(closes, ema_50, ema_200, k_values, each_data['symbol'])
-            condition_30m, type_30m = check_30m_condition(closes, ema_50, ema_200, k_values, each_data['symbol'])
-            condition_15m, type_15m = check_15m_condition(closes, ema_50, ema_200, k_values, each_data['symbol'])
-
-            if condition_1hr and condition_30m and condition_15m and type_1hr == type_30m and type_30m == type_15m:
-                print("Strong {type} entry found for trade : {trade}".format(type=type_30m, trade=each_data['symbol']))
-                send_message(
-                    "Strong {type} entry found for trade : {trade}".format(type=type_30m, trade=each_data['symbol']))
+            check_condition(closes, ema_50, ema_200, k_values, each_data['symbol'], '2hr')
+            check_condition(closes, ema_50, ema_200, k_values, each_data['symbol'], '1hr')
+            check_condition(closes, ema_50, ema_200, k_values, each_data['symbol'], '30m')
 
             if (t2 - t1).microseconds * 0.001 * 0.001 < 1:
                 time.sleep(1 - (t2 - t1).microseconds * 0.001 * 0.001 + 0.1)
 
         except Exception as e:
             print("Exception for trade {trade} : {e}".format(trade=each_data['symbol'], e=e))
+
+
+def check_condition(closes, ema_50, ema_200, k_values, symbol, condition_type):
+    try:
+        k_value_prev = pd.Series.tolist(k_values[condition_type])[
+            len(pd.Series.tolist(k_values[condition_type])) - 2]
+        k_value = pd.Series.tolist(k_values[condition_type])[len(pd.Series.tolist(k_values[condition_type])) - 1]
+
+        ema_1 = ema_50[condition_type][len(ema_50[condition_type]) - 1]
+        ema_2 = ema_200[condition_type][len(ema_200[condition_type]) - 1]
+
+        closes_ = closes[condition_type]
+
+        print(("{condition_type} - current close for symbol : {symbol} is {value}".format(condition_type=condition_type,
+                                                                                          symbol=symbol, value=closes_[
+                len(closes_) - 1])))
+        print("{condition_type} - ema 50 for symbol : {symbol} is {value}".format(condition_type=condition_type,
+                                                                                  symbol=symbol, value=ema_1))
+        print("{condition_type} - ema 200 for symbol : {symbol} is {value}".format(condition_type=condition_type,
+                                                                                   symbol=symbol, value=ema_2))
+        print("{condition_type} - k value for symbol : {symbol} is {value}".format(condition_type=condition_type,
+                                                                                   symbol=symbol, value=k_value))
+        print(
+            "{condition_type} - k previous value for symbol : {symbol} is {value}".format(condition_type=condition_type,
+                                                                                          symbol=symbol,
+                                                                                          value=k_value_prev))
+
+        if k_value_prev <= 20 and k_value > 20 and ema_1 > closes_[len(closes_) - 1] > ema_2:
+            print("{condition_type}  Strong Buy entry found for trade : {trade}".format(condition_type=condition_type,
+                                                                                        trade=symbol))
+            send_message(
+                "{condition_type}  Strong Buy entry found for trade : {trade}".format(condition_type=condition_type,
+                                                                                      trade=symbol))
+            return True, 'BUY'
+        elif k_value_prev >= 80 and k_value < 80 and ema_1 < closes_[
+            len(closes_) - 1] < ema_2:
+            print("{condition_type}  Strong sell entry found for trade : {trade}".format(condition_type=condition_type,
+                                                                                         trade=symbol))
+            send_message(
+                "{condition_type}  Strong sell entry found for trade : {trade}".format(condition_type=condition_type,
+                                                                                       trade=symbol))
+            return True, 'SELL'
+        elif k_value_prev <= 20 and k_value > 20 and ema_1 > ema_2:
+            print("{condition_type}  Buy entry found for trade : {trade}".format(condition_type=condition_type,
+                                                                                 trade=symbol))
+            # send_message("[1hr] Buy entry found for trade : {trade}".format(trade=symbol))
+            return True, 'BUY'
+        elif k_value_prev >= 80 and k_value < 80 and ema_1 < ema_2:
+            print("{condition_type}  Sell entry found for trade : {trade}".format(condition_type=condition_type,
+                                                                                  trade=symbol))
+            # send_message("[1hr] Sell entry found for trade : {trade}".format(trade=symbol))
+            return True, 'SELL'
+        else:
+            print("NO entry found for trade : {trade}".format(trade=symbol))
+            return False, None
+    except Exception as e:
+        print("Exception for trade {trade} : {e}".format(trade=symbol, e=e))
+
+    return False, None
 
 
 def check_1hr_condition(closes, ema_50, ema_200, k_values, symbol):
@@ -114,11 +169,11 @@ def check_1hr_condition(closes, ema_50, ema_200, k_values, symbol):
             return True, 'SELL'
         elif k_value_prev_1hr <= 20 and k_value_1hr > 20 and ema_1_1hr > ema_2_1hr:
             print("[1hr] Buy entry found for trade : {trade}".format(trade=symbol))
-            send_message("[1hr] Buy entry found for trade : {trade}".format(trade=symbol))
+            # send_message("[1hr] Buy entry found for trade : {trade}".format(trade=symbol))
             return True, 'BUY'
         elif k_value_prev_1hr >= 80 and k_value_1hr < 80 and ema_1_1hr < ema_2_1hr:
             print("[1hr] Sell entry found for trade : {trade}".format(trade=symbol))
-            send_message("[1hr] Sell entry found for trade : {trade}".format(trade=symbol))
+            # send_message("[1hr] Sell entry found for trade : {trade}".format(trade=symbol))
             return True, 'SELL'
         else:
             print("NO entry found for trade : {trade}".format(trade=symbol))
