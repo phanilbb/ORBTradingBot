@@ -5,6 +5,7 @@ from smartapi import SmartConnect
 import pyotp
 import time_helper
 import exception_handling
+import rate_limit_checker
 
 trading_apis = {
     'api_key': 'pSbQYzxm',
@@ -108,6 +109,7 @@ def historic_data(obj, token, fromdate, todate, interval):
     }
 
     try:
+        rate_limit_checker.historic_rate_limit_checker()
         response = obj.getCandleData(historicParam)
         if not response['status']:
             print("Historic data api failed with status false")
