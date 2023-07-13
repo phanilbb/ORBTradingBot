@@ -99,12 +99,14 @@ def check_condition(closes, ema_50, ema_200, k_values, symbol, condition_type):
         elif k_value_prev <= 20 and k_value > 20 and ema_1 > ema_2:
             print("{condition_type}  Buy entry found for trade : {trade}".format(condition_type=condition_type,
                                                                                  trade=symbol))
-            send_message("[1hr] Buy entry found for trade : {trade}".format(trade=symbol))
+            send_message("{condition_type}  Buy entry found for trade : {trade}".format(condition_type=condition_type,
+                                                                                        trade=symbol))
             return True, 'BUY'
         elif k_value_prev >= 80 and k_value < 80 and ema_1 < ema_2:
             print("{condition_type}  Sell entry found for trade : {trade}".format(condition_type=condition_type,
                                                                                   trade=symbol))
-            send_message("[1hr] Sell entry found for trade : {trade}".format(trade=symbol))
+            send_message("{condition_type}  Sell entry found for trade : {trade}".format(condition_type=condition_type,
+                                                                                         trade=symbol))
             return True, 'SELL'
         else:
             print("NO entry found for trade : {trade}".format(trade=symbol))
