@@ -18,7 +18,7 @@ def historic_rate_limit_checker():
 
 def wait_time(t2, t1):
     if (t2 - t1).microseconds * 0.001 * 0.001 < 1:
-        time.sleep(1 - (t2 - t1).microseconds * 0.001 * 0.001 + 0.1)
+        time.sleep(1 - (t2 - t1).microseconds * 0.001 * 0.001)
         global historic_api_rate_limit_times
         historic_api_rate_limit_times = []
 
