@@ -20,7 +20,10 @@ def send_message(bot_message):
     return response.json()
 
 
-trades_taken = []
+trades_taken = [{
+    'symbol': 'POWERGRID-EQ',
+    'entry_type': 'BUY'
+}]
 
 
 def lambda_handler(event, context):
