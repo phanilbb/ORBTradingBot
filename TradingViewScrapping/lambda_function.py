@@ -10,6 +10,7 @@ from _datetime import datetime
 
 
 def send_message(bot_message):
+    print("Sending msg : " + bot_message)
     bot_token = '5945431317:AAFzROpE5IpiuiJyJJyXdCp7prE5-EH7mOg'
     bot_chatID = '1170124746'
     send_text = 'https://api.telegram.org/bot' + bot_token + '/sendMessage?chat_id=' + bot_chatID + '&parse_mode=Markdown&text=' + bot_message
@@ -17,6 +18,9 @@ def send_message(bot_message):
     response = requests.get(send_text)
 
     return response.json()
+
+
+trades_taken = []
 
 
 def lambda_handler(event, context):
@@ -48,12 +52,48 @@ def lambda_handler(event, context):
             closes['2hr'] = [e[4] for e in historic_data_2hr]
             ema_50['2hr'] = calculate_ema(closes['2hr'], 50)
             ema_200['2hr'] = calculate_ema(closes['2hr'], 200)
-            rsi_2hr, k1_2hr, d1_2hr = stoch_rsi_tradingview(pd.Series(closes['2hr']))
-            k_values['2hr'] = k1_2hr
-            check_condition(closes, ema_50, ema_200, k_values, each_data['symbol'], '2hr')
+            # rsi_2hr, k1_2hr, d1_2hr = stoch_rsi_tradingview(pd.Series(closes['2hr']))
+            # k_values['2hr'] = k1_2hr
+            # check_condition(closes, ema_50, ema_200, k_values, each_data['symbol'], '2hr')
+            check_ema_crossover(ema_50, ema_200, '2hr', each_data['symbol'])
 
         except Exception as e:
             print("Exception for trade {trade} : {e}".format(trade=each_data['symbol'], e=e))
+
+
+def check_ema_crossover(ema_50, ema_200, condition_type, symbol):
+    ema_50_current = ema_50[condition_type][len(ema_50[condition_type]) - 1]
+    ema_50_previous = ema_50[condition_type][len(ema_50[condition_type]) - 2]
+
+    ema_200_current = ema_200[condition_type][len(ema_200[condition_type]) - 1]
+    ema_200_previous = ema_200[condition_type][len(ema_200[condition_type]) - 2]
+
+    print("50 EMA Current : " + str(ema_50_current))
+    print("200 EMA Current : " + str(ema_200_current))
+    print("50 EMA Previous : " + str(ema_50_previous))
+    print("200 EMA Previous : " + str(ema_200_previous))
+
+    if ema_50_current < ema_200_current and ema_50_previous > ema_200_previous:
+        send_message(
+            "Strong SELL entry found for trade : {trade}".format(condition_type=condition_type,
+                                                                 trade=symbol))
+
+    if ema_50_current > ema_200_current and ema_50_previous < ema_200_previous:
+        send_message(
+            "Strong BUY entry found for trade : {trade}".format(condition_type=condition_type,
+                                                                trade=symbol))
+
+    if trades_taken:
+        for each_trade in trades_taken:
+            if each_trade['symbol'] == symbol:
+                if each_trade['entry_type'] == "BUY" and ema_50_current < ema_200_current:
+                    send_message(
+                        "EXIT entry found for trade : {trade}".format(condition_type=condition_type,
+                                                                      trade=symbol))
+                if each_trade['entry_type'] == "SELL" and ema_50_current > ema_200_current:
+                    send_message(
+                        "EXIT entry found for trade : {trade}".format(condition_type=condition_type,
+                                                                      trade=symbol))
 
 
 def check_condition(closes, ema_50, ema_200, k_values, symbol, condition_type):
