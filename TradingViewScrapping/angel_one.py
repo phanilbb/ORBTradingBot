@@ -125,6 +125,7 @@ def historic_data(obj, token, fromdate, todate, interval):
 
     except Exception as e:
         print("Historic Api failed: {}".format(e))
+        rate_limit_checker.print_times()
         exception_handling.send_message("Historic Api failed: {}".format(e))
         return []
 
