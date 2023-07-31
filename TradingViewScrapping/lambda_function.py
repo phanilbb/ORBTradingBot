@@ -40,8 +40,8 @@ def lambda_handler(event, context):
 
     for each_data in data:
 
-        if each_data['symbol'] != 'BRITANNIA-EQ':
-            continue
+        # if each_data['symbol'] != 'BRITANNIA-EQ':
+        #     continue
 
         closes = {}
         ema_50 = {}
