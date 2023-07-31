@@ -40,6 +40,9 @@ def lambda_handler(event, context):
 
     for each_data in data:
 
+        if each_data['symbol'] != 'BRITANNIA-EQ':
+            continue
+
         closes = {}
         ema_50 = {}
         ema_200 = {}
@@ -62,6 +65,8 @@ def lambda_handler(event, context):
 
         except Exception as e:
             print("Exception for trade {trade} : {e}".format(trade=each_data['symbol'], e=e))
+
+    send_message("Ran Successfully")
 
 
 def check_ema_crossover(ema_50, ema_200, condition_type, symbol):
