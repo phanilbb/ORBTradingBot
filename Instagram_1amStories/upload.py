@@ -67,5 +67,5 @@ def new_post():
     text, topic = content_generator.get_text_from_sheet()
     caption = caption_generator.generate_caption(text, topic)
     image_paths = image_editor.make_image(text, topic)
-    for image_path in image_paths:
-        upload(image_path, caption)
+    # for image_path in image_paths:
+    #     upload(image_path, caption)

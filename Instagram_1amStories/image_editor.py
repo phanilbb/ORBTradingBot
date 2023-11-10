@@ -49,7 +49,7 @@ def add_bg_text_for_quote(image, text, font, text_color, text_start_height, widt
 
 
 def add_bg_text_for_poem(image, text, font, text_color):
-    line_spacing = 6
+    line_spacing = 10
     draw = ImageDraw.Draw(image)
 
     image_width, image_height = image.size
@@ -64,8 +64,9 @@ def add_bg_text_for_poem(image, text, font, text_color):
     for line in lines:
         line = line.strip()
         text_width, text_height = draw.textsize(line, font)
-        draw.text((x_text, y_text), line, font=font, fill=text_color)
-        y_text += text_height + line_spacing
+        line_width, line_height = font.getsize(line)
+        draw.text(((image_width - line_width) / 2, y_text), line, font=font, fill=text_color, align="center")
+        y_text += (text_height + line_spacing)
 
     return image
 
@@ -80,7 +81,7 @@ def add_text(background, text, width):
     text_start_height = 500 - (28 * text_count)
 
     enhancer = ImageEnhance.Brightness(background)
-    background = enhancer.enhance(0.45)
+    background = enhancer.enhance(0.3)
 
     if '\n' in text:
         add_bg_text_for_poem(background, text, font, text_color)
@@ -100,8 +101,8 @@ def image_editor(background, background_name, text):
     image_path = os.path.join(tmp_dir, background_name)
     background.save(image_path)
     image_paths.append(image_path)
-    # im = Image.open(image_path)
-    # im.show()
+    im = Image.open(image_path)
+    im.show()
     print("Image generated successfully")
     return image_paths
 
