@@ -36,3 +36,55 @@ def delete(delete_hash):
     r = requests.delete(url, headers=headers)
     print("Image delete response " + r.text)
     return True
+
+
+def get_all_albums():
+    url = "https://api.imgur.com/3/account/phani1703/albums"
+    headers = {
+        'Authorization': 'Client-ID {}'.format(os.environ['imgur_client_id'])
+    }
+
+    r = requests.get(url, headers=headers)
+    print("Album get response " + r.text)
+    return r.json()
+
+
+def get_album(topic):
+    response = get_all_albums()
+    default = None
+    if 'success' in response and response['success'] and 'data' in response and response['data']:
+        for each_album in response['data']:
+            if each_album['title'].lower() == topic.lower():
+                return each_album
+            if each_album['title'].lower() == 'default':
+                default = each_album
+
+    return default
+
+
+def get_album_data(album_id):
+    url = "https://api.imgur.com/3/account/phani1703/album/{}".format(album_id)
+    headers = {
+        'Authorization': 'Client-ID {}'.format(os.environ['imgur_client_id'])
+    }
+
+    r = requests.get(url, headers=headers)
+    print("Album ID get response " + r.text)
+    return r.json()
+
+
+def get_images_list(topic):
+    album = get_album(topic)
+    data = []
+    if not album:
+        return data
+
+    response = get_album_data(album['id'])
+    if 'success' in response and response['success'] and 'data' in response and response['data']:
+        for each_image in response['data']['images']:
+            data.append({
+                'link': each_image['link'],
+                'id': each_image['id']
+            })
+
+    return data

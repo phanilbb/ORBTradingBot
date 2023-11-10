@@ -36,12 +36,11 @@ def delete_row():
     val = uploadSheet.acell('A2')
     topic = uploadSheet.acell('B2')
     if val:
-        uploadedSheet = gsheet.worksheet("uploaded")
         data = []
         data.append(val.value)
         data.append(topic.value)
-        uploadedSheet.append_row(data, 2)
         uploadSheet.delete_row(2)
+        uploadSheet.append_row(data, 2)
 
 
 if __name__ == "__main__":

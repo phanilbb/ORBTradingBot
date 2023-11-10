@@ -69,7 +69,3 @@ def new_post():
     image_paths = image_editor.make_image(text, topic)
     for image_path in image_paths:
         upload(image_path, caption)
-
-
-if __name__ == "__main__":
-    new_post()
