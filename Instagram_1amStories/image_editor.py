@@ -80,7 +80,7 @@ def add_text(background, text, width):
     text_start_height = 500 - (28 * text_count)
 
     enhancer = ImageEnhance.Brightness(background)
-    background = enhancer.enhance(0.3)
+    background = enhancer.enhance(0.45)
 
     if '\n' in text:
         add_bg_text_for_poem(background, text, font, text_color)
