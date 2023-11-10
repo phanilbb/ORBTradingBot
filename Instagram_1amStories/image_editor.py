@@ -101,8 +101,8 @@ def image_editor(background, background_name, text):
     image_path = os.path.join(tmp_dir, background_name)
     background.save(image_path)
     image_paths.append(image_path)
-    im = Image.open(image_path)
-    im.show()
+    # im = Image.open(image_path)
+    # im.show()
     print("Image generated successfully")
     return image_paths
 
