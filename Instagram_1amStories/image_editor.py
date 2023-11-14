@@ -1,14 +1,14 @@
 import os
-import random
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance
 import image_uploader
 import requests
+import background_selector
 
 
 def get_images(topic):
     image_data = image_uploader.get_images_list(topic)
-    random.shuffle(image_data)
-    file = image_data[0]
+    index = background_selector.get_background_index(topic, len(image_data) - 1)
+    file = image_data[index]
     return Image.open(requests.get(file['link'], stream=True).raw), '{}.jpg'.format(file['id'])
 
 

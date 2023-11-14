@@ -21,12 +21,13 @@ def get_text_from_sheet():
     wsheet = gsheet.worksheet("upload")
     val = wsheet.acell('A2')
     topic = wsheet.acell('B2')
+    author = wsheet.acell('C2')
     if val:
-        return val.value, topic.value
+        return val.value, topic.value, author.value
     else:
         communication.telegram_bot_sendtext("No data available in google sheets")
 
-    return get_quote()
+    return None, None, None
 
 
 def delete_row():
@@ -35,13 +36,12 @@ def delete_row():
     uploadSheet = gsheet.worksheet("upload")
     val = uploadSheet.acell('A2')
     topic = uploadSheet.acell('B2')
+    author = uploadSheet.acell('C2')
     if val:
+        uploadedSheet = gsheet.worksheet("uploaded")
         data = []
         data.append(val.value)
         data.append(topic.value)
+        data.append(author.value)
+        uploadedSheet.append_row(data, 2)
         uploadSheet.delete_row(2)
-        uploadSheet.append_row(data, 2)
-
-
-if __name__ == "__main__":
-    val, topic = get_text_from_sheet()

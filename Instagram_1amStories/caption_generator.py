@@ -9,11 +9,19 @@ CAPTION = """Like if you relate. Share if you love.
 .
 —————————————————
 {hashtags}
+.
+{author}
 """
 
 
-def generate_caption(text, topic):
-    hashtags = hashtag_generator.generate_hashtags_from_text(text,topic)
+def generate_caption(text, topic, author):
+    if not author or author == '-':
+        author = '.'
+    else:
+        author = 'By - ' + author
 
-    caption = CAPTION.format(hashtags=hashtags)
+    hashtags = hashtag_generator.generate_hashtags_from_text(text, topic)
+
+    caption = CAPTION.format(hashtags=hashtags, author=author)
+
     return caption
