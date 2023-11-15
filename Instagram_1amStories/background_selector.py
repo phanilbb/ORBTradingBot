@@ -11,13 +11,13 @@ def get_background_index(topic, max):
     for i in range(2, wsheet.row_count):
         val = wsheet.acell('A' + str(i))
         print("Picked topic : " + str(val.value))
-        if val.value.lower() == topic.lower():
+        if val.value.lower() == topic.lower() or val.value.lower() == "default":
             index = int(wsheet.acell('B' + str(i)).value)
-            if (index + 1 > max):
+            if index + 1 > max:
                 wsheet.update_acell('B' + str(i), 0)
             else:
                 wsheet.update_acell('B' + str(i), index + 1)
             print("BG index for topic : " + topic + " is : " + str(index))
             return index
 
-    return int(random.randrange(0, max))
+    return int(random.randrange(0, max + 1))
