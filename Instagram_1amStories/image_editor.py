@@ -12,9 +12,9 @@ def get_images(topic):
     return Image.open(requests.get(file['link'], stream=True).raw), '{}.jpg'.format(file['id'])
 
 
-def add_bg_text_for_quote(image, text, font, text_color, text_start_height, width):
-    max_words_per_line = 6
-    max_characters_per_line = 36
+def add_bg_line(image, text, font, text_color, text_start_height):
+    max_words_per_line = 8
+    max_characters_per_line = 45
     draw = ImageDraw.Draw(image)
 
     image_width, image_height = image.size
@@ -42,51 +42,40 @@ def add_bg_text_for_quote(image, text, font, text_color, text_start_height, widt
     for line in lines:
         line = ' '.join(line)
         line_width, line_height = font.getsize(line)
-        draw.text(((image_width - line_width) / 2, y_text), line, font=font, fill=text_color)
+        draw.text(((image_width - line_width) / 2, y_text), line, font=font, fill=text_color, align='left')
         y_text += line_height
 
-    return image
+    return y_text
 
 
-def add_bg_text_for_poem(image, text, font, text_color):
+def add_bg_text(image, text, font, text_color):
     line_spacing = 10
     draw = ImageDraw.Draw(image)
 
     image_width, image_height = image.size
     text_width, text_height = draw.textsize(text, font)
 
-    x_text = (image_width - text_width) // 2
     y_text = (image_height - text_height) // 2 - (((image_height - text_height) // 2) / 100) * 30
 
-    # Split the text into lines
     lines = text.split('\n')
-
     for line in lines:
         line = line.strip()
-        text_width, text_height = draw.textsize(line, font)
-        line_width, line_height = font.getsize(line)
-        draw.text(((image_width - line_width) / 2, y_text), line, font=font, fill=text_color, align="center")
-        y_text += (text_height + line_spacing)
+        if line:
+            y_text = add_bg_line(image, line, font, text_color, y_text)
+            y_text += line_spacing
+        else:
+            y_text += 3 * line_spacing
 
     return image
 
 
-def add_text(background, text, width):
+def add_text(background, text):
     fontsize = 50
     font = ImageFont.truetype("Dosis-Bold.ttf", fontsize)
-
     text_color = (255, 255, 255)
-    text_count = text.count('')
-    text_count = text_count / 30
-    text_start_height = 500 - (28 * text_count)
-
     enhancer = ImageEnhance.Brightness(background)
     background = enhancer.enhance(0.45)
-
-    if '\n' in text:
-        add_bg_text_for_poem(background, text, font, text_color)
-    else:
-        add_bg_text_for_quote(background, text, font, text_color, text_start_height, width)
+    add_bg_text(background, text, font, text_color)
     return background
 
 
@@ -96,8 +85,7 @@ def image_editor(background, background_name, text):
         os.makedirs(tmp_dir)
 
     image_paths = []
-    width, height = background.width - 40, background.height
-    background = add_text(background, text, width)
+    background = add_text(background, text)
     image_path = os.path.join(tmp_dir, background_name)
     background.save(image_path)
     image_paths.append(image_path)
