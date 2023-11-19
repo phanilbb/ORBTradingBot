@@ -4,7 +4,7 @@ import requests
 import communication
 
 
-def upload(image):
+def upload_image(image):
     with open(image, "rb") as file:
         url = "https://api.imgur.com/3/image"
         headers = {
@@ -88,3 +88,24 @@ def get_images_list(topic):
             })
 
     return data
+
+
+def upload_video(video):
+    url = "https://api.imgur.com/3/upload"
+    headers = {
+        'Authorization': 'Client-ID {}'.format(os.environ['imgur_client_id'])
+    }
+
+    files = {'video': (video, open(video, 'rb'))}
+
+    try:
+        r = requests.post(url, files=files, headers=headers)
+        print("video upload response " + r.text)
+        response = r.json()
+        if 'success' in response and response['success']:
+            return response['data']
+        else:
+            communication.telegram_bot_sendtext("video failed to upload to imgur with success false")
+        return {}
+    except Exception as e:
+        communication.telegram_bot_sendtext("video failed to upload to imgur : " + str(e))

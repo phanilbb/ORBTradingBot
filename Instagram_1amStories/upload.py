@@ -5,8 +5,9 @@ import image_editor
 import requests
 import content_generator
 import caption_generator
-import image_uploader
+import imgur
 import communication
+import reels_maker
 
 
 def get_images(start_directory):
@@ -26,7 +27,7 @@ def upload(image, caption):
         ig_user_id = os.environ['ig_user_id']
         access_token = os.environ['ig_access_token']
         post_url = 'https://graph.facebook.com/v18.0/{}/media'.format(ig_user_id)
-        image_upload_data = image_uploader.upload(image)
+        image_upload_data = imgur.upload_image(image)
         if not image_upload_data:
             print("image hosting failed")
             return
@@ -60,7 +61,7 @@ def upload(image, caption):
     finally:
         os.remove(image)
         if 'deletehash' in image_upload_data:
-            image_uploader.delete(image_upload_data['deletehash'])
+            imgur.delete(image_upload_data['deletehash'])
 
 
 def new_post():
@@ -69,3 +70,12 @@ def new_post():
     image_paths = image_editor.make_image(text, topic)
     for image_path in image_paths:
         upload(image_path, caption)
+
+
+def new_reel():
+    audio_path = reels_maker.get_audio_file()
+    video_path = reels_maker.get_video()
+    text, topic, author = content_generator.get_text_from_sheet()
+    caption = caption_generator.generate_caption(text, topic, author)
+    video_path = reels_maker.create_video(text, "image", video_path, audio_path, "video")
+    reels_maker.upload(video_path, caption)

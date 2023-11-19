@@ -1,6 +1,6 @@
 import os
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance
-import image_uploader
+import imgur
 import requests
 import background_selector
 
