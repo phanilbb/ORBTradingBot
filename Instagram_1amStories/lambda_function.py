@@ -16,7 +16,7 @@ def time_checker():
 
     for reel_time in reels_time:
         actual_time = time(reel_time, 0, 0)
-        time_range = timedelta(minutes=5)
+        time_range = timedelta(minutes=60)
         start_time = (datetime.combine(datetime.today(), actual_time) - time_range).time()
         end_time = (datetime.combine(datetime.today(), actual_time) + time_range).time()
         if start_time <= current_time <= end_time:

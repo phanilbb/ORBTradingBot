@@ -6,7 +6,7 @@ import background_selector
 
 
 def get_images(topic):
-    image_data = image_uploader.get_images_list(topic)
+    image_data = imgur.get_images_list(topic)
     index = background_selector.get_background_index(topic, len(image_data) - 1)
     file = image_data[index]
     return Image.open(requests.get(file['link'], stream=True).raw), '{}.jpg'.format(file['id'])

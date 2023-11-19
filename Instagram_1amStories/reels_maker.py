@@ -19,11 +19,7 @@ import random
 def get_audio_file():
     bucket_name = '1amstoriess'
     folder_path = 'audio/'
-    s3 = boto3.client('s3',
-                      aws_secret_access_key=os.environ['AWS_SECRET_KEY'],
-                      aws_access_key_id=os.environ['AWS_SECRET_ID'],
-                      region_name=os.environ['AWS_REGION']
-                      )
+    s3 = boto3.client('s3')
     response = s3.list_objects_v2(Bucket=bucket_name, Prefix=folder_path)
     keys = [obj['Key'] for obj in response.get('Contents', []) if obj['Key'].endswith('.mp3')]
 
