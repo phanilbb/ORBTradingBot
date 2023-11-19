@@ -84,8 +84,9 @@ def create_video(text, text_name, video_file, audio_file, file_name):
     text2_y: int = image_text_source_y
 
     output_path = '/tmp'
-    if output_path and not os.path.exists(output_path):
-        os.makedirs(output_path)
+    if output_path:
+        if not os.path.exists(output_path):
+            os.makedirs(output_path)
         output_path = output_path + "/{}.mp4".format(file_name)
     else:
         output_path = "{}.mp4".format(file_name)
