@@ -78,4 +78,4 @@ def new_reel():
     text, topic, author = content_generator.get_text_from_sheet()
     caption = caption_generator.generate_caption(text, topic, author)
     video_path = reels_maker.create_video(text, "image", video_path, audio_path, "video")
-    reels_maker.upload(video_path, caption)
+    #reels_maker.upload(video_path, caption)

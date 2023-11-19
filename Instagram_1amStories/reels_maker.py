@@ -1,7 +1,5 @@
 import os
-import random
 import time
-
 import background_selector
 import requests
 import subprocess
@@ -14,13 +12,32 @@ import imgur
 import content_generator
 import json
 import communication
-import caption_generator
+import boto3
+import random
 
 
 def get_audio_file():
-    audio_files = [f"audio/{file}" for file in os.listdir("audio") if file.endswith(".mp3")]
-    random.shuffle(audio_files)
-    return audio_files[0]
+    bucket_name = '1amstoriess'
+    folder_path = 'audio/'
+    s3 = boto3.client('s3',
+                      aws_secret_access_key=os.environ['AWS_SECRET_KEY'],
+                      aws_access_key_id=os.environ['AWS_SECRET_ID'],
+                      region_name=os.environ['AWS_REGION']
+                      )
+    response = s3.list_objects_v2(Bucket=bucket_name, Prefix=folder_path)
+    keys = [obj['Key'] for obj in response.get('Contents', []) if obj['Key'].endswith('.mp3')]
+
+    if not keys:
+        print("No audio files found in the specified folder.")
+        return None
+    random_audio_file = random.choice(keys)
+    tmp_dir = '/tmp'
+    if not os.path.exists(tmp_dir):
+        os.makedirs(tmp_dir)
+
+    local_path = tmp_dir + "/downloaded_audio.mp3"
+    s3.download_file(bucket_name, random_audio_file, local_path)
+    return local_path
 
 
 def get_video():
@@ -60,14 +77,11 @@ def create_video(text, text_name, video_file, audio_file, file_name):
     video_size = re.findall('\d+', result.stdout.decode())[0:2]
     video_width, video_height = map(int, video_size)
 
-    # Get video duration
     ffprobe_command = f'ffprobe -i "{video_file}" -show_entries format=duration -v quiet -of csv="p=0"'
     video_duration = subprocess.check_output(ffprobe_command, shell=True)
     video_duration = float(video_duration.decode('utf-8').strip())
 
-    # Set the start time of text
     text_start_time = 0
-    # Create image of verse
     created_verse_image_data = create_image(text, (int(video_width), int(video_height / 2)), text_name)
     created_verse_image = created_verse_image_data[0]
 
@@ -113,7 +127,7 @@ def create_image(text, image_size, text_name):
     text_color = (255, 255, 255, 255)
 
     img = Image.new('RGBA', image_size, color=(190, 190, 190, 0))
-    font = ImageFont.truetype(font=f'Dosis-Bold.ttf', size=50)
+    font = ImageFont.truetype(font=f'Dosis-Bold.ttf', size=40)
     draw = ImageDraw.Draw(im=img)
     avg_char_width = sum(font.getbbox(char)[2] for char in ascii_letters) / len(ascii_letters)
     max_char_count = max(int(img.size[0] * .718 / avg_char_width), max_char_count)
