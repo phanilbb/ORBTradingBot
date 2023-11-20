@@ -99,7 +99,7 @@ def create_video(text, text_name, video_file, audio_file, file_name):
         '-i "{}" -i "{}" -r 24 -filter_complex '
         '"[1:v]eq=brightness=-0.1[v1]; '
         '[v1][2:v]overlay=(W-w)/2:{}:enable=\'between(t,{},{})\'[v2]" '
-        '-t {} -map "[v2]" -map 0 -c:v libx264 -preset veryfast -crf 18 "{}"'
+        '-t {} -map "[v2]" -map 0 -c:v libx264 -preset veryfast -crf 18 -s 1080x1920 "{}"'
     ).format(
         audio_file, video_file, created_verse_image,
         text2_y, text_start_time, video_duration,
