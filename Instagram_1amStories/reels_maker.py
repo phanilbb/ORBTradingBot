@@ -78,7 +78,7 @@ def create_video(text, text_name, video_file, audio_file, file_name):
     video_duration = float(video_duration.decode('utf-8').strip())
 
     text_start_time = 0
-    created_verse_image_data = create_image(text, (int(video_width), int(video_height / 2)), text_name)
+    created_verse_image_data = create_image(text, (int(video_width), int(video_height)), text_name)
     created_verse_image = created_verse_image_data[0]
 
     text2_y: int = image_text_source_y
@@ -89,6 +89,9 @@ def create_video(text, text_name, video_file, audio_file, file_name):
             os.makedirs(output_path)
         output_path = output_path + "/{}.mp4".format(file_name)
     else:
+        output_path = "{}.mp4".format(file_name)
+
+    if os.environ.get("env", "aws") == "local":
         output_path = "{}.mp4".format(file_name)
 
     ffmpeg_command = (

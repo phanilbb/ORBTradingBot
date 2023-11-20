@@ -13,11 +13,12 @@ def get_background_index(topic, max):
         print("Picked topic : " + str(val.value))
         if val.value.lower() == topic.lower() or val.value.lower() == "default":
             index = int(wsheet.acell('B' + str(i)).value)
-            if index + 1 > max:
-                wsheet.update_acell('B' + str(i), 0)
-            else:
-                wsheet.update_acell('B' + str(i), index + 1)
-            print("BG index for topic : " + topic + " is : " + str(index))
+            if os.environ.get("env", "aws") != "local":
+                if index + 1 > max:
+                    wsheet.update_acell('B' + str(i), 0)
+                else:
+                    wsheet.update_acell('B' + str(i), index + 1)
+                print("BG index for topic : " + topic + " is : " + str(index))
             return index
 
     return int(random.randrange(0, max + 1))
