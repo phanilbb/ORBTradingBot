@@ -1,7 +1,7 @@
 import upload
 from datetime import datetime, time, timedelta
 
-reels_time = [1, 13]
+reels_time = [7, 19]
 
 
 def lambda_handler(event, context):
