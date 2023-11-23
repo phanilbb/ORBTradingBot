@@ -12,56 +12,28 @@ import imgur
 import content_generator
 import json
 import communication
-import boto3
 import random
+import s3
 
 
 def get_audio_file():
-    bucket_name = '1amstoriess'
-    folder_path = 'audio/'
-    s3 = boto3.client('s3')
-    response = s3.list_objects_v2(Bucket=bucket_name, Prefix=folder_path)
-    keys = [obj['Key'] for obj in response.get('Contents', []) if obj['Key'].endswith('.mp3')]
-
-    if not keys:
+    audio_list = s3.get_audio_list()
+    if not audio_list:
         print("No audio files found in the specified folder.")
         return None
-    random_audio_file = random.choice(keys)
-    tmp_dir = '/tmp'
-    if not os.path.exists(tmp_dir):
-        os.makedirs(tmp_dir)
-
-    local_path = tmp_dir + "/downloaded_audio.mp3"
-    s3.download_file(bucket_name, random_audio_file, local_path)
-    return local_path
+    random_audio_file = random.choice(audio_list)
+    return s3.download_file(random_audio_file, '/tmp', 'downloaded_audio.mp3')
 
 
 def get_video():
-    image_data = imgur.get_images_list("reels")
-    index = background_selector.get_background_index("reels", len(image_data) - 1)
-    file = image_data[index]
-    tmp_dir = '/tmp'
-    if not os.path.exists(tmp_dir):
-        os.makedirs(tmp_dir)
-    file_path = tmp_dir + "/downloaded_file.mp4"
-    if download_mp4(file['link'], file_path):
-        return file_path
-    return None
+    video_list = s3.get_video_list()
+    if not video_list:
+        print("No video files found in the specified folder.")
+        return None
+    index = background_selector.get_background_index("reels", len(video_list) - 1)
+    file = video_list[index]
 
-
-def download_mp4(url, save_path):
-    response = requests.get(url, stream=True)
-    if response.status_code == 200:
-        with open(save_path, 'wb') as file:
-            for chunk in response.iter_content(chunk_size=1024):
-                if chunk:
-                    file.write(chunk)
-        print(f"Download completed. File saved at: {save_path}")
-        return True
-    else:
-        print(f"Failed to download. Status code: {response.status_code}")
-
-    return False
+    return s3.download_file(file, '/tmp', 'downloaded_file.mp4')
 
 
 def create_video(text, text_name, video_file, audio_file, file_name):
@@ -147,18 +119,12 @@ def create_image(text, image_size, text_name):
 
 
 def upload(video_path, caption):
-    video_upload_data = {}
     try:
         ig_user_id = os.environ['ig_user_id']
         access_token = os.environ['ig_access_token']
         post_url = 'https://graph.facebook.com/v18.0/{}/media'.format(ig_user_id)
-        video_upload_data = imgur.upload_video(video_path)
-        if not video_upload_data:
-            print("video hosting failed")
-            return
-
         payload = {
-            'video_url': video_upload_data['link'],
+            'video_url': s3.get_public_url(video_path),
             'caption': caption,
             'access_token': access_token,
             'media_type': 'REELS',
@@ -185,10 +151,6 @@ def upload(video_path, caption):
     except Exception as e:
         print(e)
         communication.telegram_bot_sendtext("Reel failed to post to instagram : " + str(e))
-    finally:
-        os.remove(video_path)
-        if 'deletehash' in video_upload_data:
-            imgur.delete(video_upload_data['deletehash'])
 
 
 def wait_till_finished(id):

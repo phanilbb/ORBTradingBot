@@ -1,15 +1,16 @@
 import os
+import textwrap
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance
-import imgur
-import requests
 import background_selector
+import s3
 
 
 def get_images(topic):
-    image_data = imgur.get_images_list(topic)
-    index = background_selector.get_background_index(topic, len(image_data) - 1)
-    file = image_data[index]
-    return Image.open(requests.get(file['link'], stream=True).raw), '{}.jpg'.format(file['id'])
+    images_data = s3.get_images_list(topic)
+    index = background_selector.get_background_index(topic, len(images_data) - 1)
+    file_path = images_data[index]
+    local_file_path = s3.download_file(file_path, '/tmp', "downloaded_image.jpg")
+    return Image.open(local_file_path)
 
 
 def add_bg_line(image, text, font, text_color, text_start_height):
@@ -69,6 +70,14 @@ def add_bg_text(image, text, font, text_color):
     return image
 
 
+def add_bg_text_2(image, text, font, text_color):
+    new_text = textwrap.fill(text=text, replace_whitespace=False, max_lines=8)
+    draw = ImageDraw.Draw(image)
+    xy = (image.size[0] / 10, image.size[1] / 3)
+    draw.text(xy, text=new_text, font=font, fill=text_color, align='center')
+    return image
+
+
 def add_text(background, text):
     fontsize = 50
     font = ImageFont.truetype("Dosis-Bold.ttf", fontsize)
@@ -96,5 +105,5 @@ def image_editor(background, background_name, text):
 
 
 def make_image(content, topic):
-    BACKGROUND, BACKGROUND_NAME = get_images(topic)
-    return image_editor(BACKGROUND, BACKGROUND_NAME, content)
+    image = get_images(topic)
+    return image_editor(image, "downloaded_image.jpg", content)

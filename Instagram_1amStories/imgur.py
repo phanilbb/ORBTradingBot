@@ -96,7 +96,7 @@ def upload_video(video):
         'Authorization': 'Client-ID {}'.format(os.environ['imgur_client_id'])
     }
 
-    files = {'video': (video, open(video, 'rb'))}
+    files = {'video': (video, open(video, 'rb'), 'video/mp4', {'quality': '100'})}
 
     try:
         r = requests.post(url, files=files, headers=headers)
