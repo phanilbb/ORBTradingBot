@@ -1,21 +1,24 @@
 import os
+import random
 import textwrap
-from PIL import Image, ImageDraw, ImageFont, ImageEnhance
-import background_selector
+from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageFilter
 import s3
+
+LOGO_TEXT = '@1am.storiess'
 
 
 def get_images(topic):
     images_data = s3.get_images_list(topic)
-    index = background_selector.get_background_index(topic, len(images_data) - 1)
-    file_path = images_data[index]
+    if not images_data:
+        images_data = s3.get_images_list("default")
+    file_path = random.choice(images_data)
     local_file_path = s3.download_file(file_path, '/tmp', "downloaded_image.jpg")
     return Image.open(local_file_path)
 
 
 def add_bg_line(image, text, font, text_color, text_start_height):
-    max_words_per_line = 8
-    max_characters_per_line = 45
+    max_words_per_line = 5
+    max_characters_per_line = 30
     draw = ImageDraw.Draw(image)
 
     image_width, image_height = image.size
@@ -56,7 +59,7 @@ def add_bg_text(image, text, font, text_color):
     image_width, image_height = image.size
     text_width, text_height = draw.textsize(text, font)
 
-    y_text = (image_height - text_height) // 2 - (((image_height - text_height) // 2) / 100) * 30
+    y_text = (image_height - text_height) // 2 - (((image_height - text_height) // 2) / 100) * 40
 
     lines = text.split('\n')
     for line in lines:
@@ -70,21 +73,31 @@ def add_bg_text(image, text, font, text_color):
     return image
 
 
-def add_bg_text_2(image, text, font, text_color):
+def add_bg_text_2(image, text, text_color):
+    fontsize = 30
+    font = ImageFont.truetype("Dosis-Bold.ttf", fontsize)
     new_text = textwrap.fill(text=text, replace_whitespace=False, max_lines=8)
     draw = ImageDraw.Draw(image)
-    xy = (image.size[0] / 10, image.size[1] / 3)
-    draw.text(xy, text=new_text, font=font, fill=text_color, align='center')
+
+    # Calculate text size and position
+    text_width, text_height = draw.textsize(new_text, font)
+    x = (image.width - text_width) // 2  # Center horizontally
+    y = image.height - text_height - 20  # Bottom of the image
+
+    draw.text((x, y), text=new_text, font=font, fill=text_color, align='center')
+
     return image
 
 
 def add_text(background, text):
-    fontsize = 50
-    font = ImageFont.truetype("Dosis-Bold.ttf", fontsize)
+    fontsize = 70
+    font = ImageFont.truetype("Alata-Regular.ttf", fontsize)
     text_color = (255, 255, 255)
     enhancer = ImageEnhance.Brightness(background)
     background = enhancer.enhance(0.45)
+    background = background.filter(ImageFilter.GaussianBlur(5))
     add_bg_text(background, text, font, text_color)
+    add_bg_text_2(background, LOGO_TEXT, text_color)
     return background
 
 

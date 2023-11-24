@@ -30,8 +30,7 @@ def get_video():
     if not video_list:
         print("No video files found in the specified folder.")
         return None
-    index = background_selector.get_background_index("reels", len(video_list) - 1)
-    file = video_list[index]
+    file = random.choice(video_list)
 
     return s3.download_file(file, '/tmp', 'downloaded_file.mp4')
 
@@ -69,7 +68,7 @@ def create_video(text, text_name, video_file, audio_file, file_name):
     ffmpeg_command = (
         'ffmpeg -loglevel error -stats -y -i "{}" '
         '-i "{}" -i "{}" -r 24 -filter_complex '
-        '"[1:v]eq=brightness=-0.1[v1]; '
+        '"[1:v]eq=brightness=-0.1[g];[g]gblur=sigma=10[v1]; '
         '[v1][2:v]overlay=(W-w)/2:{}:enable=\'between(t,{},{})\'[v2]" '
         '-t {} -map "[v2]" -map 0 -c:v libx264 -preset veryfast -crf 18 -s 1080x1920 "{}"'
     ).format(
@@ -95,11 +94,11 @@ def create_image(text, image_size, text_name):
     if not os.path.exists(save_path):
         os.makedirs(save_path)
 
-    max_char_count = 40
+    max_char_count = 28
     text_color = (255, 255, 255, 255)
 
     img = Image.new('RGBA', image_size, color=(190, 190, 190, 0))
-    font = ImageFont.truetype(font=f'Dosis-Bold.ttf', size=40)
+    font = ImageFont.truetype(font=f'Alata-Regular.ttf', size=70)
     draw = ImageDraw.Draw(im=img)
     avg_char_width = sum(font.getbbox(char)[2] for char in ascii_letters) / len(ascii_letters)
     max_char_count = max(int(img.size[0] * .718 / avg_char_width), max_char_count)
