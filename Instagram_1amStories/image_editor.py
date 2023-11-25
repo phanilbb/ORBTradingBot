@@ -59,7 +59,7 @@ def add_bg_text(image, text, font, text_color):
     image_width, image_height = image.size
     text_width, text_height = draw.textsize(text, font)
 
-    y_text = (image_height - text_height) // 2 - (((image_height - text_height) // 2) / 100) * 40
+    y_text = (image_height - text_height) // 2 - (((image_height - text_height) // 2) / 100) * 45
 
     lines = text.split('\n')
     for line in lines:
@@ -91,11 +91,11 @@ def add_bg_text_2(image, text, text_color):
 
 def add_text(background, text):
     fontsize = 70
-    font = ImageFont.truetype("Alata-Regular.ttf", fontsize)
+    font = ImageFont.truetype("Dosis-Bold.ttf", fontsize)
     text_color = (255, 255, 255)
     enhancer = ImageEnhance.Brightness(background)
     background = enhancer.enhance(0.45)
-    background = background.filter(ImageFilter.GaussianBlur(5))
+    background = background.filter(ImageFilter.GaussianBlur(3))
     add_bg_text(background, text, font, text_color)
     add_bg_text_2(background, LOGO_TEXT, text_color)
     return background

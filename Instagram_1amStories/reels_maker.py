@@ -98,7 +98,7 @@ def create_image(text, image_size, text_name):
     text_color = (255, 255, 255, 255)
 
     img = Image.new('RGBA', image_size, color=(190, 190, 190, 0))
-    font = ImageFont.truetype(font=f'Alata-Regular.ttf', size=70)
+    font = ImageFont.truetype(font=f'Dosis-Bold.ttf', size=70)
     draw = ImageDraw.Draw(im=img)
     avg_char_width = sum(font.getbbox(char)[2] for char in ascii_letters) / len(ascii_letters)
     max_char_count = max(int(img.size[0] * .718 / avg_char_width), max_char_count)
