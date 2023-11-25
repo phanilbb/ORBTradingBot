@@ -94,7 +94,7 @@ def create_image(text, image_size, text_name):
     if not os.path.exists(save_path):
         os.makedirs(save_path)
 
-    max_char_count = 28
+    max_char_count = 35
     text_color = (255, 255, 255, 255)
 
     img = Image.new('RGBA', image_size, color=(190, 190, 190, 0))
