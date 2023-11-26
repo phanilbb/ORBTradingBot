@@ -59,7 +59,7 @@ def add_bg_text(image, text, font, text_color):
     image_width, image_height = image.size
     text_width, text_height = draw.textsize(text, font)
 
-    y_text = (image_height - text_height) // 2 - (((image_height - text_height) // 2) / 100) * 45
+    y_text = (image_height - text_height) // 2 - (((image_height - text_height) // 2) / 100) * 30
 
     lines = text.split('\n')
     for line in lines:
