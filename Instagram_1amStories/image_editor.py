@@ -75,7 +75,7 @@ def add_bg_text(image, text, font, text_color):
 
 def add_bg_text_2(image, text, text_color):
     fontsize = 30
-    font = ImageFont.truetype("Dosis-Bold.ttf", fontsize)
+    font = ImageFont.truetype("Alata-Regular.ttf", fontsize)
     new_text = textwrap.fill(text=text, replace_whitespace=False, max_lines=8)
     draw = ImageDraw.Draw(image)
 
