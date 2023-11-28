@@ -70,8 +70,9 @@ def get_images_list(topic):
     return fetch_keys(response, '.jpg') + fetch_keys(response, '.jpeg')
 
 
-def get_audio_list():
-    response = get_folder_objects(AUDIO_FOLDER)
+def get_audio_list(topic):
+    audio_folder = AUDIO_FOLDER + topic.lower() + "/"
+    response = get_folder_objects(audio_folder)
     return fetch_keys(response, '.mp3')
 
 

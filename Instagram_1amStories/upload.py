@@ -77,9 +77,9 @@ def new_post():
 
 
 def new_reel():
-    audio_path = reels_maker.get_audio_file()
-    video_path = reels_maker.get_video()
     text, topic, author = content_generator.get_text_from_sheet()
+    audio_path = reels_maker.get_audio_file(topic)
+    video_path = reels_maker.get_video()
     caption = caption_generator.generate_caption(text, topic, author)
     video_path = reels_maker.create_video(text, "image", video_path, audio_path, "video")
     keys = upload_to_s3(video_path, '/tmp', 'reel.mp4')

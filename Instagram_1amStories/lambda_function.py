@@ -5,10 +5,11 @@ reels_time = [12]
 
 
 def lambda_handler(event, context):
-    if time_checker():
-        upload.new_reel()
-    else:
-        upload.new_post()
+    upload.new_reel()
+    # if time_checker():
+    #     upload.new_reel()
+    # else:
+    #     upload.new_post()
 
 
 def time_checker():

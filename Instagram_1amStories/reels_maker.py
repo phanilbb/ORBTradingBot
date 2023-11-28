@@ -16,8 +16,10 @@ import random
 import s3
 
 
-def get_audio_file():
-    audio_list = s3.get_audio_list()
+def get_audio_file(topic):
+    audio_list = s3.get_audio_list(topic)
+    if not audio_list:
+        audio_list = s3.get_audio_list("default")
     if not audio_list:
         print("No audio files found in the specified folder.")
         return None
@@ -95,6 +97,7 @@ def create_image(text, image_size, text_name):
         os.makedirs(save_path)
 
     max_char_count = 30
+    line_spacing = 30
     text_color = (255, 255, 255, 255)
 
     img = Image.new('RGBA', image_size, color=(190, 190, 190, 0))
@@ -107,9 +110,9 @@ def create_image(text, image_size, text_name):
     shadow_draw = ImageDraw.Draw(im=shadow_image)
     shadow_draw.text(xy=(img.size[0] / 2 - 1, img.size[1] / 2 + 4), text=new_text, font=font, fill=(0, 0, 0, 80),
                      anchor='mm',
-                     align='center')
+                     align='center', spacing=line_spacing)
     draw.text(xy=(img.size[0] / 2, img.size[1] / 2), text=new_text, font=font, fill=text_color, anchor='mm',
-              align='center')
+              align='center', spacing=line_spacing)
     combined = Image.alpha_composite(shadow_image, img)
     final = combined.crop(combined.getbbox())
     path_to_check = f"{save_path}/{text_name}.png"
