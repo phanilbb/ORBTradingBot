@@ -8,8 +8,10 @@ import textwrap
 import time
 from string import ascii_letters
 
+import PIL
 import requests
 from PIL import Image, ImageDraw, ImageFont
+from pilmoji import Pilmoji
 
 import communication
 import content_generator
@@ -99,20 +101,24 @@ def create_image(text, image_size, text_name):
     max_char_count = 30
     line_spacing = 30
     text_color = (255, 255, 255, 255)
+    if not hasattr(PIL.Image, 'Resampling'):
+        PIL.Image.Resampling = PIL.Image
 
     img = Image.new('RGBA', image_size, color=(190, 190, 190, 0))
     font = ImageFont.truetype(font=f'Alata-Regular.ttf', size=70)
-    draw = ImageDraw.Draw(im=img)
     avg_char_width = sum(font.getbbox(char)[2] for char in ascii_letters) / len(ascii_letters)
     max_char_count = max(int(img.size[0] * .718 / avg_char_width), max_char_count)
     new_text = textwrap.fill(text=text, width=max_char_count, replace_whitespace=False)
     shadow_image = Image.new('RGBA', img.size, color=(255, 255, 255, 0))
-    shadow_draw = ImageDraw.Draw(im=shadow_image)
-    shadow_draw.text(xy=(img.size[0] / 2 - 1, img.size[1] / 2 + 4), text=new_text, font=font, fill=(0, 0, 0, 80),
-                     anchor='mm',
-                     align='center', spacing=line_spacing)
-    draw.text(xy=(img.size[0] / 2, img.size[1] / 2), text=new_text, font=font, fill=text_color, anchor='mm',
-              align='center', spacing=line_spacing)
+    with Pilmoji(shadow_image) as shadow_draw:
+        shadow_draw.text(xy=(int(img.size[0] / 2) - 1, int(img.size[1] / 2) + 4), text=new_text, font=font, fill=(0, 0, 0, 80),
+                         anchor='mm',
+                         align='center', spacing=line_spacing)
+
+    with Pilmoji(img) as draw:
+        draw.text(xy=(int(img.size[0] / 2), int(img.size[1] / 2)), text=new_text, font=font, fill=text_color,
+                  anchor='mm',
+                  align='center', spacing=line_spacing)
     combined = Image.alpha_composite(shadow_image, img)
     final = combined.crop(combined.getbbox())
     path_to_check = f"{save_path}/{text_name}.png"
