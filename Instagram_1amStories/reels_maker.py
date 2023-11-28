@@ -1,18 +1,18 @@
-import os
-import time
-import background_selector
-import requests
-import subprocess
-import re
-from PIL import Image, ImageDraw, ImageFont
-from string import ascii_letters
-import textwrap
-import sys
-import imgur
-import content_generator
 import json
-import communication
+import os
 import random
+import re
+import subprocess
+import sys
+import textwrap
+import time
+from string import ascii_letters
+
+import requests
+from PIL import Image, ImageDraw, ImageFont
+
+import communication
+import content_generator
 import s3
 
 
@@ -24,7 +24,7 @@ def get_audio_file(topic):
         print("No audio files found in the specified folder.")
         return None
     random_audio_file = random.choice(audio_list)
-    return s3.download_file(random_audio_file, '/tmp', 'downloaded_audio.mp3')
+    return s3.download_file(random_audio_file, '/tmp', '{}.mp3'.format(str(round(time.time() * 1000))))
 
 
 def get_video():
@@ -34,7 +34,7 @@ def get_video():
         return None
     file = random.choice(video_list)
 
-    return s3.download_file(file, '/tmp', 'downloaded_file.mp4')
+    return s3.download_file(file, '/tmp', '{}.mp4'.format(str(round(time.time() * 1000))))
 
 
 def create_video(text, text_name, video_file, audio_file, file_name):

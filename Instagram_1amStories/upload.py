@@ -5,7 +5,7 @@ import image_editor
 import requests
 import content_generator
 import caption_generator
-import imgur
+import time
 import communication
 import reels_maker
 import s3
@@ -67,7 +67,7 @@ def new_post():
     text, topic, author = content_generator.get_text_from_sheet()
     caption = caption_generator.generate_caption(text, topic, author)
     image_paths = image_editor.make_image(text, topic)
-    keys = upload_to_s3(image_paths[0], '/tmp', 'post.jpg')
+    keys = upload_to_s3(image_paths[0], '/tmp', '{}.jpg'.format(str(round(time.time() * 1000))))
     print("Public url for key {} is {}".format(keys[0], s3.get_public_url(keys[0])))
     if os.environ.get("env", "aws") != "local":
         upload(keys[0], caption)
@@ -82,7 +82,7 @@ def new_reel():
     video_path = reels_maker.get_video()
     caption = caption_generator.generate_caption(text, topic, author)
     video_path = reels_maker.create_video(text, "image", video_path, audio_path, "video")
-    keys = upload_to_s3(video_path, '/tmp', 'reel.mp4')
+    keys = upload_to_s3(video_path, '/tmp', '{}.mp4'.format(str(round(time.time() * 1000))))
     print("Public url for key {} is {}".format(keys[0], s3.get_public_url(keys[0])))
     if os.environ.get("env", "aws") != "local":
         reels_maker.upload(keys[0], caption)

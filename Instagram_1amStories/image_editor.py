@@ -3,6 +3,7 @@ import random
 import textwrap
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageFilter
 import s3
+import time
 
 LOGO_TEXT = '@1am.storiess'
 
@@ -119,4 +120,4 @@ def image_editor(background, background_name, text):
 
 def make_image(content, topic):
     image = get_images(topic)
-    return image_editor(image, "downloaded_image.jpg", content)
+    return image_editor(image, "{}.jpg".format(str(round(time.time() * 1000))), content)

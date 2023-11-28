@@ -15,7 +15,7 @@ CAPTION = """Like if you relate. Share if you love.
 
 
 def generate_caption(text, topic, author):
-    if not author or author == '-':
+    if not author or author == '-' or author == '':
         author = '.'
     else:
         author = 'By - ' + author
