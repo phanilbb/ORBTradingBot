@@ -59,7 +59,7 @@ def add_bg_text(image, text, font, text_color):
     image_width, image_height = image.size
     text_width, text_height = draw.textsize(text, font)
 
-    y_text = (image_height - text_height) // 2 - (((image_height - text_height) // 2) / 100) * 30
+    y_text = (image_height - text_height) // 2 - (((image_height - text_height) // 2) / 100) * 40
 
     lines = text.split('\n')
     for line in lines:
@@ -75,7 +75,7 @@ def add_bg_text(image, text, font, text_color):
 
 def add_bg_text_2(image, text, text_color):
     fontsize = 30
-    font = ImageFont.truetype("Alata-Regular.ttf", fontsize)
+    font = ImageFont.truetype("Dosis-Bold.ttf", fontsize)
     new_text = textwrap.fill(text=text, replace_whitespace=False, max_lines=8)
     draw = ImageDraw.Draw(image)
 
@@ -91,7 +91,7 @@ def add_bg_text_2(image, text, text_color):
 
 def add_text(background, text):
     fontsize = 70
-    font = ImageFont.truetype("Dosis-Bold.ttf", fontsize)
+    font = ImageFont.truetype("Alata-Regular.ttf", fontsize)
     text_color = (255, 255, 255)
     enhancer = ImageEnhance.Brightness(background)
     background = enhancer.enhance(0.45)
