@@ -68,7 +68,7 @@ def new_post():
     caption = caption_generator.generate_caption(text, topic, author)
     image_paths = image_editor.make_image(text, topic)
     keys = upload_to_s3(image_paths[0], '/tmp', '{}.jpg'.format(str(round(time.time() * 1000))))
-    print("Public url for key {} is {}".format(keys[0], s3.get_public_url(keys[0])))
+    print("Public url for key {} is {}".format(keys[0], s3.get_public_url(keys[len(keys) - 1])))
     if os.environ.get("env", "aws") != "local":
         upload(keys[0], caption)
         os.remove(image_paths[0])
@@ -83,7 +83,7 @@ def new_reel():
     caption = caption_generator.generate_caption(text, topic, author)
     video_path = reels_maker.create_video(text, "image", video_path, audio_path, "video")
     keys = upload_to_s3(video_path, '/tmp', '{}.mp4'.format(str(round(time.time() * 1000))))
-    print("Public url for key {} is {}".format(keys[0], s3.get_public_url(keys[0])))
+    print("Public url for key {} is {}".format(keys[0], s3.get_public_url(keys[len(keys) - 1])))
     if os.environ.get("env", "aws") != "local":
         reels_maker.upload(keys[0], caption)
         os.remove(video_path)
