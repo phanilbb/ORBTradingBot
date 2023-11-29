@@ -6,7 +6,6 @@ import PIL
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageFilter
 import s3
 import time
-from pilmoji import Pilmoji
 
 LOGO_TEXT = '@1am.storiess'
 
@@ -26,6 +25,8 @@ def add_bg_line(image, text, font, text_color, text_start_height):
 
     image_width, image_height = image.size
     y_text = text_start_height
+
+    draw = ImageDraw.Draw(image)
 
     words = text.split()  # Split the text into individual words
     lines = []
@@ -49,10 +50,7 @@ def add_bg_line(image, text, font, text_color, text_start_height):
     for line in lines:
         line = ' '.join(line)
         line_width, line_height = font.getsize(line)
-        if not hasattr(PIL.Image, 'Resampling'):
-            PIL.Image.Resampling = PIL.Image
-        with Pilmoji(image) as draw:
-            draw.text(((image_width - line_width) // 2, int(y_text)), line, font=font, fill=text_color, align='left')
+        draw.text(((image_width - line_width) / 2, y_text), line, font=font, fill=text_color, align='left')
         y_text += line_height
 
     return y_text
