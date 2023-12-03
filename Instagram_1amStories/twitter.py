@@ -1,5 +1,7 @@
 import requests
 
+ENABLE = False
+
 
 def find_keys_with_name(data, target_key="name"):
     result_keys = []
@@ -21,6 +23,9 @@ def find_keys_with_name(data, target_key="name"):
 
 def get_trending_hashtags():
     result = []
+
+    if not ENABLE:
+        return result
 
     try:
         url = "https://twitter.com/i/api/2/guide.json"
