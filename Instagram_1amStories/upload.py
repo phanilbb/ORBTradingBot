@@ -23,25 +23,6 @@ def get_images(start_directory):
     return image
 
 
-test_user_ids = ['63521226083',
-                 '63340232823',
-                 '62849207619',
-                 '63313926856',
-                 '58135851682',
-                 '12732864631',
-                 '60170162878',
-                 '3088241603',
-                 '63413457431',
-                 '52670695935',
-                 '60030142022',
-                 '45544959473',
-                 '63131395839',
-                 '63061738109',
-                 '3248689993',
-                 '61713907149',
-                 '52674032392',
-                 '61389034435']
-
 
 def upload(s3_image_path, caption):
     try:
@@ -53,8 +34,7 @@ def upload(s3_image_path, caption):
             'image_url': s3.get_public_url(s3_image_path),
             'caption': caption,
             'access_token': access_token,
-            'location_id': 109524955741121,
-            'tags': test_user_ids
+            'location_id': 109524955741121
         }
 
         r = requests.post(post_url, data=payload)
