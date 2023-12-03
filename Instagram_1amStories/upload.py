@@ -8,6 +8,7 @@ import caption_generator
 import time
 import communication
 import reels_maker
+import reel_Q_5A
 import s3
 
 
@@ -22,6 +23,26 @@ def get_images(start_directory):
     return image
 
 
+test_user_ids = ['63521226083',
+                 '63340232823',
+                 '62849207619',
+                 '63313926856',
+                 '58135851682',
+                 '12732864631',
+                 '60170162878',
+                 '3088241603',
+                 '63413457431',
+                 '52670695935',
+                 '60030142022',
+                 '45544959473',
+                 '63131395839',
+                 '63061738109',
+                 '3248689993',
+                 '61713907149',
+                 '52674032392',
+                 '61389034435']
+
+
 def upload(s3_image_path, caption):
     try:
         ig_user_id = os.environ['ig_user_id']
@@ -32,7 +53,8 @@ def upload(s3_image_path, caption):
             'image_url': s3.get_public_url(s3_image_path),
             'caption': caption,
             'access_token': access_token,
-            'location_id': 109524955741121
+            'location_id': 109524955741121,
+            'tags': test_user_ids
         }
 
         r = requests.post(post_url, data=payload)
@@ -82,6 +104,23 @@ def new_reel():
     video_path = reels_maker.get_video()
     caption = caption_generator.generate_caption(text, topic, author)
     video_path = reels_maker.create_video(text, "image", video_path, audio_path, "video")
+    keys = upload_to_s3(video_path, '/tmp', '{}.mp4'.format(str(round(time.time() * 1000))))
+    print("Public url for key {} is {}".format(keys[0], s3.get_public_url(keys[len(keys) - 1])))
+    if os.environ.get("env", "aws") != "local":
+        reels_maker.upload(keys[0], caption)
+        os.remove(video_path)
+        for key in keys:
+            s3.delete_file(key)
+
+
+def new_reels():
+    upload_data = content_generator.get_text_from_sheet_for_reels()
+    audio_path = reels_maker.get_audio_file(upload_data['topic'])
+    video_path = reels_maker.get_video()
+    caption = caption_generator.generate_caption(upload_data['question'], upload_data['topic'], None)
+    if upload_data['reel_id'] == 'Q_5A':
+        video_path = reel_Q_5A.create_video(upload_data, "image", video_path, audio_path, "video")
+
     keys = upload_to_s3(video_path, '/tmp', '{}.mp4'.format(str(round(time.time() * 1000))))
     print("Public url for key {} is {}".format(keys[0], s3.get_public_url(keys[len(keys) - 1])))
     if os.environ.get("env", "aws") != "local":
