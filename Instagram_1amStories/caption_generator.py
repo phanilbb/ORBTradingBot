@@ -19,7 +19,7 @@ Tag someone ❤️
 CAPTIONS = {
 
     "love": [
-        "I expressed your love through a quote\nCan you express your love through a like? 🥰😁"
+        "I expressed your love through a quote\nCan you express your love through a like? 🥰😁",
         "Love in every like 👍, and I'm loving you endlessly. ❤️👍",
         "If you heart this, you've just hearted my love story. Double-tap away! 💕",
         "A like for love, a love for a lifetime. Will you be my liker forever? 😊❤️",
@@ -30,7 +30,7 @@ CAPTIONS = {
         "Double tap and give me your heart ❤️. I will convey it to your partner on your behalf 🥰"
     ],
     "motivation": [
-        "I motivated you through a quote\nCan u motivate me with a like? 🔥❤️"
+        "I motivated you through a quote\nCan u motivate me with a like? 🔥❤️",
         "Turning likes into motivation, one double-tap at a time. Give me a boost! 💪👍",
         "Your like is my fuel to keep the motivation burning. Let's light it up! 🔥❤️",
         "Need a dose of motivation? A like from you is the perfect remedy. Double-tap to inspire! 💙👍",
@@ -55,7 +55,7 @@ CAPTIONS = {
         "Success is sweet, but a like from you makes it sweeter. Let's savor the journey! 🍾❤️"
     ],
     "breakup": [
-        "My Heart is broken 💔. Can you fix it with a like? ❤️"
+        "My Heart is broken 💔. Can you fix it with a like? ❤️",
         "Heartbroken but not defeated. A like is a step towards healing. 💔👍",
         "In the process of letting go, every like is a sigh of relief. Join me on the journey. 🌬️❤️",
         "Click like to send a virtual hug to my healing heart. Let's mend together. 🤗👍",
