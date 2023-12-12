@@ -6,7 +6,7 @@ import sys
 import time
 
 from PIL import Image
-
+from helpers import constants
 import image_editor
 import s3
 
@@ -99,7 +99,7 @@ def create_image(text, img_size, text_name):
         'Title': text
     }
     img = Image.new('RGBA', img_size, color=(190, 190, 190, 0))
-    image_editor.add_main_text(img, data, text_color, text_width=30)
+    image_editor.add_main_text(img, data, text_color, text_width=constants.TEXT_WIDTH_REEL)
     path_to_check = f"{save_path}/{text_name}.png"
     img.save(f"{path_to_check}")
     return path_to_check

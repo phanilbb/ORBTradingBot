@@ -35,7 +35,7 @@ def add_logo_text(image, text, text_color):
     return image
 
 
-def add_main_text(image, text, text_color, text_width=constants.TEXT_WIDTH):
+def add_main_text(image, text, text_color, text_width=constants.TEXT_WIDTH_POST):
     fontsize = constants.TEXT_FONT_SIZE
     font = ImageFont.truetype(constants.TEXT_FONT_LOCATION, fontsize)
 
