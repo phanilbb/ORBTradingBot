@@ -53,7 +53,6 @@ def upload(video_path, caption):
             r = requests.post(second_url, data=second_payload)
             print(r.text)
             print("Reel published to instagram")
-            content_generator.delete_row()
         else:
             print("Reel posting not possible")
     except Exception as e:
