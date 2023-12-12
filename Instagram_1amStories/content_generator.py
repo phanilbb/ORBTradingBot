@@ -46,3 +46,4 @@ def backup_and_delete(upload_sheet_name, backup_sheet_name, row):
     values = upload_sheet.row_values(row)
     backup_sheet = gsheet.worksheet(backup_sheet_name)
     backup_sheet.append_row(values)
+    upload_sheet.delete_row(row)
