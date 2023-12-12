@@ -1,11 +1,10 @@
 import requests
 import json
 import communication
-import twitter
 
 hashtag_generator_url = "https://www.veed.io/script-generator-ap/api/generate-non-streaming-text"
 
-default_hashtags = "#quotes #quoteoftheday #quotesdaily #quotesaboutlife"
+default_hashtags = "#1amStoriess #quotes #quoteoftheday #quotesdaily #quotesaboutlife"
 
 
 def generate_hashtags(topic):
@@ -45,28 +44,22 @@ def generate_hashtags(topic):
 def generate_hashtags_from_text(text, topic):
     try:
         hashtags = generate_hashtags(topic)
-        twitter_hashtags = twitter.get_trending_hashtags()
         if hashtags:
             data = hashtags[0]
             data = data.replace('\n', ' ')
             data = data.replace('# ', '#')
-            return get_hashtags(twitter_hashtags, data, default_hashtags)
+            return get_hashtags([], data, default_hashtags)
         else:
-            return get_hashtags(twitter_hashtags, '', default_hashtags)
+            return get_hashtags([], '', default_hashtags)
     except Exception as e:
         print(e)
         return default_hashtags
 
 
 def get_hashtags(twitter_hashtags, data, default_hashtags):
-    result = default_hashtags.split('#')  + (' '.join(twitter_hashtags)).split('#') + data.split('#')
+    result = default_hashtags.split('#') + (' '.join(twitter_hashtags)).split('#') + data.split('#')
     result_updated = ['#' + each for each in result if each]
     if len(result_updated) > 28:
         result_updated = result_updated[0:28]
 
     return ' '.join(result_updated)
-
-
-if __name__ == "__main__":
-    text = "Love is not about how much you say 'I love you,' but how much you can prove that it's true."
-    print(generate_hashtags_from_text(text), 'love')

@@ -1,4 +1,5 @@
-import upload
+import upload_reel
+import upload_post
 from datetime import datetime, time, timedelta
 
 reels_time = [12]
@@ -6,9 +7,9 @@ reels_time = [12]
 
 def lambda_handler(event, context):
     if time_checker():
-        upload.new_reel()
+        upload_reel.new_reel()
     else:
-        upload.new_post()
+        upload_post.new_post()
 
 
 def time_checker():

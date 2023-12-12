@@ -1,0 +1,10 @@
+ROW_SELECTOR_SHEET = "row_selector"
+CONTENT_SHEET = "title_and_content"
+CONTENT_UPLOADED_SHEET = "title_and_content_uploaded"
+INDIA_LOCATION_ID = 109524955741121
+LOGO_FONT_LOCATION = "resources/fonts/Dosis-Bold.ttf"
+TEXT_FONT_LOCATION = "resources/fonts/JosefinSans-Bold.ttf"
+TEXT_FONT_SIZE = 50
+LINE_SPACING = 35
+LOGO_FONT_SIZE = 30
+TEXT_WIDTH = 36

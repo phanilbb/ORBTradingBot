@@ -1,6 +1,7 @@
 import requests
 import os
 
+
 def telegram_bot_sendtext(bot_message):
     bot_token = os.environ['telegram_bot_token']
     bot_chatID = os.environ['telegram_bot_chat_id']

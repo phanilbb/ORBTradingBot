@@ -1,6 +1,6 @@
 import boto3
 import os
-
+import communication
 from botocore.exceptions import NoCredentialsError
 
 BUCKET_NAME = '1amstoriess'
@@ -19,6 +19,7 @@ def get_s3_connection():
             S3 = boto3.client('s3')
         except Exception as e:
             print("S3 connection failed with error : " + str(e))
+            communication.telegram_bot_sendtext("S3 connection failed with error : " + str(e))
     return S3
 
 
@@ -39,6 +40,7 @@ def download_file(file_path, local_directory, file_name):
 
 
 def upload_file(local_file_path, s3_folder, s3_file_name):
+    s3_folder = s3_folder.split('/')[1]
     s3 = get_s3_connection()
     s3Key = '{}/{}'.format(s3_folder, s3_file_name)
     try:
@@ -46,9 +48,11 @@ def upload_file(local_file_path, s3_folder, s3_file_name):
         print(f"File uploaded successfully to " + s3Key)
     except FileNotFoundError:
         print(f"The file {local_file_path} was not found.")
+        communication.telegram_bot_sendtext(f"The file {local_file_path} was not found.")
     except NoCredentialsError:
         print("Credentials not available.")
-    return s3_folder + s3_file_name
+        communication.telegram_bot_sendtext("Credentials not available.")
+    return s3_folder + "/" + s3_file_name
 
 
 def delete_file(s3Key):
@@ -57,7 +61,8 @@ def delete_file(s3Key):
         s3.delete_object(Bucket=BUCKET_NAME, Key=s3Key)
         print(f"File deleted successfully from {BUCKET_NAME}/{s3Key}")
     except Exception as e:
-        print("File Deletion Failed : " + str(e))
+        print("File Deletion Failed for key {} with error {} ".format(s3Key, str(e)))
+        communication.telegram_bot_sendtext("File Deletion Failed for key {} with error {} ".format(s3Key, str(e)))
 
 
 def fetch_keys(response, ends_with):
