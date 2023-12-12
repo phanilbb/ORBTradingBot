@@ -2,7 +2,6 @@ import os
 import random
 import textwrap
 import time
-from pilmoji import Pilmoji
 import PIL.Image
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageFilter
 from helpers import constants
@@ -36,14 +35,11 @@ def add_logo_text(image, text, text_color):
     return image
 
 
-def add_main_text(image, text, text_color, text_width = constants.TEXT_WIDTH):
+def add_main_text(image, text, text_color, text_width=constants.TEXT_WIDTH):
     fontsize = constants.TEXT_FONT_SIZE
     font = ImageFont.truetype(constants.TEXT_FONT_LOCATION, fontsize)
 
     draw = ImageDraw.Draw(image)
-    pilmoji = Pilmoji(image)
-    if not hasattr(PIL.Image, 'Resampling'):
-        PIL.Image.Resampling = PIL.Image
 
     title_height, content_height = 0, 0
     titles, contents = [], []
@@ -69,8 +65,8 @@ def add_main_text(image, text, text_color, text_width = constants.TEXT_WIDTH):
             for each_line in each_title.split('\n'):
                 each_line_width, each_line_height = draw.textsize(each_line, font)
                 x = (image.width - each_line_width) // 2
-                pilmoji.text((x, y), text=each_line, font=font, fill=text_color, spacing=line_spacing, stroke_width=3,
-                             stroke_fill=(0, 0, 0, 80))
+                draw.text((x, y), text=each_line, font=font, fill=text_color, spacing=line_spacing, stroke_width=3,
+                          stroke_fill=(0, 0, 0, 80))
                 y += (each_line_height + line_spacing)
         else:
             y += (each_line_height + line_spacing)
@@ -80,8 +76,8 @@ def add_main_text(image, text, text_color, text_width = constants.TEXT_WIDTH):
             for each_line in each_content.split('\n'):
                 each_line_width, each_line_height = draw.textsize(each_line, font)
                 x = (image.width - each_line_width) // 2
-                pilmoji.text((x, y), text=each_line, font=font, fill=text_color, spacing=line_spacing, stroke_width=3,
-                             stroke_fill=(0, 0, 0, 80))
+                draw.text((x, y), text=each_line, font=font, fill=text_color, spacing=line_spacing, stroke_width=3,
+                          stroke_fill=(0, 0, 0, 80))
                 y += (each_line_height + line_spacing)
 
     return image
