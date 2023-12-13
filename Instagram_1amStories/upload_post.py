@@ -48,11 +48,12 @@ def upload(s3_image_path, caption):
 def new_post():
     content = content_generator.get_text_from_sheet(constants.CONTENT_SHEET)
     caption = caption_generator.generate_caption(content)
-    image_paths = image_editor.make_image(content)
-    key = s3.upload_file(image_paths[0], '/tmp', '{}.jpg'.format(str(round(time.time() * 1000))))
+    content['Title'] = None  # for normal post, title is not required.
+    image_path = image_editor.make_image(content)
+    key = s3.upload_file(image_path, '/tmp', '{}.jpg'.format(str(round(time.time() * 1000))))
     print("Public url for key {} is {}".format(key, s3.get_public_url(key)))
     if os.environ.get("env", "aws") != "local":
         upload(key, caption)
-        os.remove(image_paths[0])
+        os.remove(image_path)
         s3.delete_file(key)
         content_generator.backup_and_delete(constants.CONTENT_SHEET, constants.CONTENT_UPLOADED_SHEET, content['row'])
