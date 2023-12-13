@@ -3,6 +3,12 @@ import gspread
 import random
 from helpers import string_helper, constants
 
+CATEGORY = {
+    'love': ' ❤️',
+    'breakup': ' 💔',
+    'sad': ' 🥲'
+}
+
 
 def get_text_from_sheet(sheet):
     gc = gspread.service_account(filename='resources/credentials.json')
@@ -23,6 +29,9 @@ def format_results(result):
     result['Title'] = string_helper.add_prefix_and_suffix(result['Title'], '"')
     result['Content'] = string_helper.remove_prefix_and_suffix(result['Content'], '"')
     result['Caption'] = string_helper.remove_prefix_and_suffix(result['Caption'], '"')
+
+    if result['Category'].lower() in CATEGORY and not string_helper.is_emoji(result['Content'][-1]):
+        result['Content'] = string_helper.add_suffix(result['Content'], CATEGORY[result['Category'].lower()])
 
 
 def update_row_selector(sheet):

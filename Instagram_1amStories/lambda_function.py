@@ -5,13 +5,13 @@ from datetime import datetime, time, timedelta
 
 reels_time = [12]
 
-corousel_time = [21]
+carousel_time = [21]
 
 
 def lambda_handler(event, context):
     if time_checker(reels_time):
         upload_reel.new_reel()
-    elif time_checker(corousel_time):
+    elif time_checker(carousel_time):
         upload_corousal.new_carousel()
     else:
         upload_post.new_post()

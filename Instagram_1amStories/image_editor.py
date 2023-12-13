@@ -2,10 +2,16 @@ import os
 import random
 import textwrap
 import time
-import PIL.Image
+
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageFilter
-from helpers import constants
+
 import s3
+from helpers import constants, string_helper
+
+print("Downloading emoji font")
+file_path = "fonts/{}".format(constants.EMOJI_FONT_FILE)
+EMOJI_FONT = s3.download_file(file_path, '/tmp', constants.EMOJI_FONT_FILE)
+print("Downloaded emoji font")
 
 
 def get_images(topic):
@@ -36,6 +42,7 @@ def add_logo_text(image, text, text_color):
 def add_main_text(image, text, text_color, text_width=constants.TEXT_WIDTH_POST):
     fontsize = constants.TEXT_FONT_SIZE
     font = ImageFont.truetype(constants.TEXT_FONT_LOCATION, fontsize)
+    emoji_font = ImageFont.truetype(EMOJI_FONT, 64)
 
     draw = ImageDraw.Draw(image)
 
@@ -63,8 +70,18 @@ def add_main_text(image, text, text_color, text_width=constants.TEXT_WIDTH_POST)
             for each_line in each_title.split('\n'):
                 each_line_width, each_line_height = draw.textsize(each_line, font)
                 x = (image.width - each_line_width) // 2
-                draw.text((x, y), text=each_line, font=font, fill=text_color, spacing=line_spacing, stroke_width=1,
-                          stroke_fill=(0, 0, 0, 80))
+                for line in string_helper.split_string_by_emoji(each_line):
+                    if string_helper.is_emoji(line):
+                        draw.text((x, y + 10), text=line, font=emoji_font, spacing=line_spacing,
+                                  embedded_color=True)
+                        line_width, _ = draw.textsize(line, emoji_font)
+                        x = x + line_width
+                    else:
+                        draw.text((x, y), text=line, font=font, fill=text_color, spacing=line_spacing, stroke_width=3,
+                                  stroke_fill=(0, 0, 0, 80))
+                        line_width, _ = draw.textsize(line, font)
+                        x = x + line_width
+
                 y += (each_line_height + line_spacing)
         else:
             y += (each_line_height + line_spacing)
@@ -74,8 +91,17 @@ def add_main_text(image, text, text_color, text_width=constants.TEXT_WIDTH_POST)
             for each_line in each_content.split('\n'):
                 each_line_width, each_line_height = draw.textsize(each_line, font)
                 x = (image.width - each_line_width) // 2
-                draw.text((x, y), text=each_line, font=font, fill=text_color, spacing=line_spacing, stroke_width=1,
-                          stroke_fill=(0, 0, 0, 80))
+                for line in string_helper.split_string_by_emoji(each_line):
+                    if string_helper.is_emoji(line):
+                        draw.text((x, y + 10), text=line, font=emoji_font, spacing=line_spacing,
+                                  embedded_color=True)
+                        line_width, _ = draw.textsize(line, emoji_font)
+                        x = x + line_width
+                    else:
+                        draw.text((x, y), text=line, font=font, fill=text_color, spacing=line_spacing, stroke_width=3,
+                                  stroke_fill=(0, 0, 0, 80))
+                        line_width, _ = draw.textsize(line, font)
+                        x = x + line_width
                 y += (each_line_height + line_spacing)
 
     return image
