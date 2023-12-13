@@ -91,13 +91,15 @@ def new_carousel():
 
 def get_title_image(content):
     data = {
-        'Title': content['Title']
+        'Title': content['Title'],
+        'Content' : None
     }
     return image_editor.make_image(data, logo_text=constants.LOGO_TEXT_COROUSAL)
 
 
 def get_content_image(content):
     data = {
+        'Title': None,
         'Content': content['Content']
     }
     return image_editor.make_image(data)

@@ -5,7 +5,7 @@ from datetime import datetime, time, timedelta
 
 reels_time = [12]
 
-carousel_time = [21]
+carousel_time = [21, 22, 23]
 
 
 def lambda_handler(event, context):
@@ -22,7 +22,7 @@ def time_checker(time_checker):
 
     for reel_time in time_checker:
         actual_time = time(reel_time, 0, 0)
-        time_range = timedelta(minutes=10)
+        time_range = timedelta(minutes=60)
         start_time = (datetime.combine(datetime.today(), actual_time) - time_range).time()
         end_time = (datetime.combine(datetime.today(), actual_time) + time_range).time()
         if start_time <= current_time <= end_time:
