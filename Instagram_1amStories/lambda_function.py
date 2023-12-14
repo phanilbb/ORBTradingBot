@@ -5,7 +5,7 @@ from datetime import datetime, time, timedelta
 
 reels_time = [12]
 
-carousel_time = [13]
+carousel_time = [21]
 
 
 def lambda_handler(event, context):
