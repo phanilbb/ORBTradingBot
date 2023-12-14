@@ -78,7 +78,8 @@ def upload(s3_image_paths, caption):
 def new_carousel():
     content = content_generator.get_text_from_sheet(constants.CONTENT_SHEET)
     caption = caption_generator.generate_caption(content)
-    image_paths = [get_title_image(content), get_content_image(content)]
+    image = image_editor.get_images(content['Category'])
+    image_paths = [get_title_image(content, image), get_content_image(content, image)]
 
     keys = []
     for image_path in image_paths:
@@ -92,13 +93,15 @@ def new_carousel():
         content_generator.backup_and_delete(constants.CONTENT_SHEET, constants.CONTENT_UPLOADED_SHEET, content['row'])
 
 
-def get_title_image(content):
+def get_title_image(content, image):
     data = copy.deepcopy(content)
     data['Content'] = None
-    return image_editor.make_image(data, logo_text=constants.LOGO_TEXT_COROUSAL)
+    return image_editor.image_editor(image, "{}.jpg".format(str(round(time.time() * 1000))), content,
+                                     logo_text=constants.LOGO_TEXT_COROUSAL)
 
 
-def get_content_image(content):
+def get_content_image(content, image):
     data = copy.deepcopy(content)
     data['Title'] = None
-    return image_editor.make_image(data)
+    return image_editor.image_editor(image, "{}.jpg".format(str(round(time.time() * 1000))), content,
+                                     logo_text=constants.LOGO_TEXT_COROUSAL)

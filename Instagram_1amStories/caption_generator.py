@@ -4,7 +4,8 @@ import hashtag_generator
 
 CAPTION = """{caption}
 .
-Tag someone ❤️
+.
+Follow @1am.storiess for more 
 .
 .
 {hashtags}
