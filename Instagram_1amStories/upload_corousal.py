@@ -88,7 +88,7 @@ def new_carousel():
         key = s3.upload_file(image_path, '/tmp', '{}.jpg'.format(str(len(keys) + 1)))
         keys.append(key)
 
-    if os.environ.get("env", "aws") == "local":
+    if os.environ.get("env", "aws") != "local":
         upload(keys, caption)
         [os.remove(image_path) for image_path in image_paths]
         [s3.delete_file(key) for key in keys]
