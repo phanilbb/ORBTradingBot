@@ -28,7 +28,7 @@ def upload_get_container_id(s3_image_paths, caption):
                 'access_token': access_token,
                 'location_id': constants.INDIA_LOCATION_ID
             }
-            r = requests.post(post_url, data=json.dumps(payload))
+            r = requests.post(post_url, data=payload)
             results = json.loads(r.text)
             print("Media response : " + json.dumps(r.json()))
             if 'id' in results:
@@ -53,9 +53,11 @@ def upload(s3_image_paths, caption):
             'media_type': 'CAROUSEL',
             'children': child_ids,
             'access_token': access_token,
+            'caption': caption,
+            'location_id': constants.INDIA_LOCATION_ID
         }
 
-        r = requests.post(post_url, data=json.dumps(payload))
+        r = requests.post(post_url, json=payload)
         results = json.loads(r.text)
         print("Media response : " + json.dumps(r.json()))
         if 'id' in results:
@@ -79,14 +81,14 @@ def new_carousel():
     content = content_generator.get_text_from_sheet(constants.CONTENT_SHEET)
     caption = caption_generator.generate_caption(content)
     image = image_editor.get_images(content['Category'])
-    image_paths = [get_title_image(content, image), get_content_image(content, image)]
+    image_paths = [get_title_image(content, copy.deepcopy(image)), get_content_image(content, copy.deepcopy(image))]
 
     keys = []
     for image_path in image_paths:
         key = s3.upload_file(image_path, '/tmp', '{}.jpg'.format(str(len(keys) + 1)))
         keys.append(key)
 
-    if os.environ.get("env", "aws") != "local":
+    if os.environ.get("env", "aws") == "local":
         upload(keys, caption)
         [os.remove(image_path) for image_path in image_paths]
         [s3.delete_file(key) for key in keys]
@@ -96,12 +98,12 @@ def new_carousel():
 def get_title_image(content, image):
     data = copy.deepcopy(content)
     data['Content'] = None
-    return image_editor.image_editor(image, "{}.jpg".format(str(round(time.time() * 1000))), content,
+    return image_editor.image_editor(image, "{}.jpg".format(str(round(time.time() * 1000))), data,
                                      logo_text=constants.LOGO_TEXT_COROUSAL)
 
 
 def get_content_image(content, image):
     data = copy.deepcopy(content)
     data['Title'] = None
-    return image_editor.image_editor(image, "{}.jpg".format(str(round(time.time() * 1000))), content,
-                                     logo_text=constants.LOGO_TEXT_COROUSAL)
+    return image_editor.image_editor(image, "{}.jpg".format(str(round(time.time() * 1000))), data,
+                                     logo_text=constants.LOGO_TEXT)
