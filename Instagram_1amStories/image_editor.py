@@ -8,11 +8,6 @@ from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageFilter
 import s3
 from helpers import constants, string_helper
 
-print("Downloading emoji font")
-file_path = "fonts/{}".format(constants.EMOJI_FONT_FILE)
-EMOJI_FONT = s3.download_file(file_path, '/tmp', constants.EMOJI_FONT_FILE)
-print("Downloaded emoji font")
-
 
 def get_images(topic):
     images_data = s3.get_images_list(topic)
@@ -42,7 +37,7 @@ def add_logo_text(image, text, text_color):
 def add_main_text(image, text, text_color, text_width=constants.TEXT_WIDTH_POST):
     fontsize = constants.TEXT_FONT_SIZE
     font = ImageFont.truetype(constants.TEXT_FONT_LOCATION, fontsize)
-    emoji_font = ImageFont.truetype(EMOJI_FONT, 64)
+    emoji_font = ImageFont.truetype(constants.EMOJI_FONT_LOCATION, 64)
 
     draw = ImageDraw.Draw(image)
 
@@ -72,7 +67,7 @@ def add_main_text(image, text, text_color, text_width=constants.TEXT_WIDTH_POST)
                 x = (image.width - each_line_width) // 2
                 for line in string_helper.split_string_by_emoji(each_line):
                     if string_helper.is_emoji(line):
-                        draw.text((x, y + 10), text=line, font=emoji_font, spacing=line_spacing,
+                        draw.text((x, y + 20), text=line, font=emoji_font, spacing=line_spacing,
                                   embedded_color=True)
                         line_width, _ = draw.textsize(line, emoji_font)
                         x = x + line_width
@@ -93,7 +88,7 @@ def add_main_text(image, text, text_color, text_width=constants.TEXT_WIDTH_POST)
                 x = (image.width - each_line_width) // 2
                 for line in string_helper.split_string_by_emoji(each_line):
                     if string_helper.is_emoji(line):
-                        draw.text((x, y + 10), text=line, font=emoji_font, spacing=line_spacing,
+                        draw.text((x, y + 20), text=line, font=emoji_font, spacing=line_spacing,
                                   embedded_color=True)
                         line_width, _ = draw.textsize(line, emoji_font)
                         x = x + line_width

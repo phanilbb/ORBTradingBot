@@ -10,6 +10,7 @@ import content_generator
 import image_editor
 import s3
 from helpers import constants
+import copy
 
 
 def upload_get_container_id(s3_image_paths, caption):
@@ -27,11 +28,12 @@ def upload_get_container_id(s3_image_paths, caption):
                 'access_token': access_token,
                 'location_id': constants.INDIA_LOCATION_ID
             }
-            r = requests.post(post_url, data=payload)
+            r = requests.post(post_url, data=json.dumps(payload))
             results = json.loads(r.text)
             print("Media response : " + json.dumps(r.json()))
             if 'id' in results:
                 child_container_ids.append(results['id'])
+        return child_container_ids
 
     except Exception as e:
         print(e)
@@ -46,13 +48,14 @@ def upload(s3_image_paths, caption):
         access_token = os.environ['ig_access_token']
         post_url = 'https://graph.facebook.com/v18.0/{}/media'.format(ig_user_id)
 
+        print("Publishing child IDs : " + str(child_ids))
         payload = {
             'media_type': 'CAROUSEL',
             'children': child_ids,
             'access_token': access_token,
         }
 
-        r = requests.post(post_url, data=payload)
+        r = requests.post(post_url, data=json.dumps(payload))
         results = json.loads(r.text)
         print("Media response : " + json.dumps(r.json()))
         if 'id' in results:
@@ -90,16 +93,12 @@ def new_carousel():
 
 
 def get_title_image(content):
-    data = {
-        'Title': content['Title'],
-        'Content' : None
-    }
+    data = copy.deepcopy(content)
+    data['Content'] = None
     return image_editor.make_image(data, logo_text=constants.LOGO_TEXT_COROUSAL)
 
 
 def get_content_image(content):
-    data = {
-        'Title': None,
-        'Content': content['Content']
-    }
+    data = copy.deepcopy(content)
+    data['Title'] = None
     return image_editor.make_image(data)
