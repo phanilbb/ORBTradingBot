@@ -21,6 +21,7 @@ def get_text_from_sheet(sheet):
 def format_results(result):
     result['Category'] = 'love'
     result['Title'] = ''
+    result['Content'] = result['Quote']
 
     result['Category'] = string_helper.remove_prefix_and_suffix(result['Category'], '"')
     result['Title'] = string_helper.add_prefix_and_suffix(result['Title'], '"')
