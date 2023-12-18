@@ -1,6 +1,6 @@
 ROW_SELECTOR_SHEET = "row_selector"
-CONTENT_SHEET = "title_and_content"
-CONTENT_UPLOADED_SHEET = "title_and_content_uploaded"
+CONTENT_SHEET = "upload"
+CONTENT_UPLOADED_SHEET = "uploaded"
 INDIA_LOCATION_ID = 109524955741121
 LOGO_FONT_LOCATION = "resources/fonts/Dosis-Bold.ttf"
 TEXT_FONT_LOCATION = "resources/fonts/Alata-Regular.ttf"

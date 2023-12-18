@@ -44,7 +44,7 @@ def create_video(content, text_name, video_file, audio_file, file_name):
     video_duration = subprocess.check_output(ffprobe_command, shell=True)
     video_duration = float(video_duration.decode('utf-8').strip())
 
-    question_image = create_image(content['Title'], (int(video_width), int(video_height)), text_name + "title")
+    question_image = create_image(content['Content'], (int(video_width), int(video_height)), text_name + "title")
     answers_image = create_image(content['Content'], (int(video_width), int(video_height)), text_name + "content")
 
     output_path = '/tmp'
@@ -71,7 +71,7 @@ def create_video(content, text_name, video_file, audio_file, file_name):
         '-t {} -map "[v4]" -map 0 -c:v libx264 -preset veryfast -crf 18 -s 1080x1920 "{}"'
     ).format(
         audio_file, video_file, question_image, answers_image, answers_image,
-        text_height, text_start_time, text_start_time + 2,
+        text_height, text_start_time, text_start_time + 3,
         text_height, text_start_time + 3, video_duration - 3,
         text_height, video_duration - 3, video_duration,
         video_duration, output_path
