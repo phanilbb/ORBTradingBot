@@ -22,6 +22,7 @@ def format_results(result):
     result['Category'] = 'love'
     result['Title'] = ''
     result['Content'] = result['Quote']
+    result['Caption'] = 'Tag Someone ❤️' if 'Caption' not in result or not result['Caption'] else result['Caption']
 
     result['Category'] = string_helper.remove_prefix_and_suffix(result['Category'], '"')
     result['Title'] = string_helper.add_prefix_and_suffix(result['Title'], '"')
