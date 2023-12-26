@@ -14,6 +14,6 @@ Follow @1am.storiess for more
 
 def generate_caption(content):
     hashtags = hashtag_generator.generate_hashtags_from_text(content['Content'], content['Category'])
-    caption = CAPTION.format(hashtags=hashtags)
+    caption = CAPTION.format(caption=content['Caption'], hashtags=hashtags)
 
     return caption
