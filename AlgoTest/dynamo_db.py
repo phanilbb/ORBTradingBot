@@ -27,4 +27,7 @@ def get(account):
         KeyConditionExpression=Key('pk').eq(get_pk()) & Key('sk').eq(account)
     )
 
-    return data.get("Items")
+    if data.get("Items"):
+        return data.get("Items")[0]['login_details']
+
+    return {}

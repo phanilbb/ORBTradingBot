@@ -16,7 +16,6 @@ def run(account):
             if not activate:
                 print("strategy activation skipped")
                 continue
-            login_data = dynamo_db.get(account['name'])
             data = activate_strategy(each_strategy, login_data)
             if data["msg"] == "Strategy successfully submitted for execution":
                 continue

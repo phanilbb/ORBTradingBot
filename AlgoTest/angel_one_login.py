@@ -5,7 +5,7 @@ import json
 from smartapi import SmartConnect
 import pyotp
 
-URL = "https://algotest.in/api/broker_login/angelone_confirm/{}?auth_token={}&refresh_token={}&feed_token"
+URL = "https://algotest.in/api/broker_login/angelone_confirm/{}?auth_token={}&refresh_token={}&feed_token={}"
 
 
 def create_session(angel_one_details):
@@ -43,5 +43,5 @@ def login_angelone_algotest(broker_id, refresh_token, auth_token, feed_token, ac
     }
     r = requests.get(url=url, headers=headers)
     data = r.json()
-    print("Algotest Angelone Login data : " + json.dumps(data))
-    return True
+    print("AlgoTest AngelOne Login data : " + json.dumps(data))
+    return r.status_code == 200
