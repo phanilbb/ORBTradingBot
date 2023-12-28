@@ -10,7 +10,7 @@ URL = "https://algotest.in/api/broker_login/angelone_confirm/{}?auth_token={}&re
 
 def create_session(angel_one_details):
     obj = SmartConnect(api_key=angel_one_details['api_key'], access_token=angel_one_details['secret_key'])
-    totp = pyotp.TOTP(angel_one_details['topt'])
+    totp = pyotp.TOTP(angel_one_details['totp'])
     data = obj.generateSession(angel_one_details['id'], angel_one_details['pin'], str(totp.now()))
     print("new session generated : {}".format(json.dumps(data)))
     return data

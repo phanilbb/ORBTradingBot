@@ -3,7 +3,7 @@ import boto3
 from boto3.dynamodb.conditions import Key, Attr
 
 dynamodb = boto3.resource("dynamodb", region_name='ap-south-1')
-ALGOTESTLOGIN = dynamodb.Table('ALGOTESTLOGIN')
+ALGOTESTLOGIN = dynamodb.Table('AlgoTestLogin')
 
 
 def get_pk():
