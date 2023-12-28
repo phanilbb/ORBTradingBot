@@ -11,8 +11,10 @@ def run(account):
         print("Logging in for account {}".format(account['name']))
         login_data = login_algo_test(account['algo_test_login'])
         dynamo_db.save(login_data, account['name'])
+        return True
     except Exception as e:
         communication.telegram_bot_sendtext("{} AlgoTest login Failed".format(account['name']))
+        return False
 
 
 def login_algo_test(data):

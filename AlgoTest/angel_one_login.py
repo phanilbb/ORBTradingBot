@@ -28,9 +28,9 @@ def run(account):
         feed_token = data['data']['feedToken']
         login_angelone_algotest(broker_id, refresh_token, auth_token, feed_token, login_data['access_token_cookie'],
                                 login_data['csrf_access_token'])
-
     except Exception as e:
         communication.telegram_bot_sendtext("{} Broker login Failed with err : {}".format(account['name'], str(e)))
+        return False
 
 
 def login_angelone_algotest(broker_id, refresh_token, auth_token, feed_token, access_token_cookie, csrf_access_token):
@@ -44,4 +44,4 @@ def login_angelone_algotest(broker_id, refresh_token, auth_token, feed_token, ac
     r = requests.get(url=url, headers=headers)
     data = r.json()
     print("Algotest Angelone Login data : " + json.dumps(data))
-    return data
+    return True

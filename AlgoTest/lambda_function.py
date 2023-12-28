@@ -1,6 +1,7 @@
 import login
 import angel_one_login
 import activate_strategy
+import communication
 
 
 def lambda_handler(event, context):
@@ -8,9 +9,13 @@ def lambda_handler(event, context):
 
     for each_account in accounts:
         executions = each_account['executions']
-        if 'algo_test_login' in executions:
-            login.run(each_account)
-        if 'broker_login' in executions:
-            angel_one_login.run(each_account)
-        if 'strategies' in executions:
-            activate_strategy.run(each_account)
+        success = True
+        if 'algo_test_login' in executions and success:
+            success = login.run(each_account)
+        if 'broker_login' in executions and success:
+            success = angel_one_login.run(each_account)
+        if 'strategies' in executions and success:
+            success = activate_strategy.run(each_account)
+
+        if success:
+            communication.telegram_bot_sendtext("{} - AlgoTest Successful".format(each_account['name']))
