@@ -30,7 +30,7 @@ def run(account):
                                 login_data['csrf_access_token'])
 
     except Exception as e:
-        communication.telegram_bot_sendtext("{} Broker login Failed".format(account))
+        communication.telegram_bot_sendtext("{} Broker login Failed with err : {}".format(account['name'], str(e)))
 
 
 def login_angelone_algotest(broker_id, refresh_token, auth_token, feed_token, access_token_cookie, csrf_access_token):
