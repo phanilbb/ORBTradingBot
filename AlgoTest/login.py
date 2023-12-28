@@ -1,20 +1,18 @@
 import json
 import requests
-import communication
 import dynamo_db
 
 URL = "https://algotest.in/api/login"
 
 
-def run(account):
+def run(account, result):
     try:
         print("Logging in for account {}".format(account['name']))
         login_data = login_algo_test(account['algo_test_login'])
         dynamo_db.save(login_data, account['name'])
-        return True
     except Exception as e:
-        communication.telegram_bot_sendtext("{} AlgoTest login Failed".format(account['name']))
-        return False
+        result['success'] = False
+        result['error'] = "{} AlgoTest login Failed : {}".format(account['name'], str(e))
 
 
 def login_algo_test(data):

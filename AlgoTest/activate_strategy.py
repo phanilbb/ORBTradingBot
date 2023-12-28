@@ -1,14 +1,12 @@
 import json
 import requests
-import communication
 import dynamo_db
 
 URL = "https://algotest.in/api/execution/start"
 
 
-def run(account):
+def run(account, result):
     print("Strategy Activation for account {}".format(account['name']))
-    success = True
     for each_strategy in account['strategies']:
         try:
             login_data = dynamo_db.get(account['name'])
@@ -20,17 +18,12 @@ def run(account):
             if data["msg"] == "Strategy successfully submitted for execution":
                 continue
             else:
-                communication.telegram_bot_sendtext(
-                    "{} AlgoTest Strategy '{}' Activation Failed".format(account['name'], each_strategy['name']))
-                success = False
+                result['success'] = False
+                result['error'] = "{}' Activation Failed : {}".format(each_strategy['name'], data["msg"])
 
         except Exception as e:
-            communication.telegram_bot_sendtext(
-                "Strategy activation failed for {} with ID {} | exception : {}".format(account['name'],
-                                                                                       each_strategy['strategy'],
-                                                                                       str(e)))
-            success = False
-    return success
+            result['success'] = False
+            result['error'] = "{}' Activation Failed : {}".format(each_strategy['name'], str(e))
 
 
 def calculate_profit_loss(trades):

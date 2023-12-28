@@ -1,9 +1,9 @@
 import requests
 import dynamo_db
-import communication
 import json
 from smartapi import SmartConnect
 import pyotp
+import errors
 
 URL = "https://algotest.in/api/broker_login/angelone_confirm/{}?auth_token={}&refresh_token={}&feed_token={}"
 
@@ -16,7 +16,7 @@ def create_session(angel_one_details):
     return data
 
 
-def run(account):
+def run(account, result):
     try:
         print("Broker Logging in for account {}".format(account['name']))
         login_data = dynamo_db.get(account['name'])
@@ -29,7 +29,8 @@ def run(account):
         login_angelone_algotest(broker_id, refresh_token, auth_token, feed_token, login_data['access_token_cookie'],
                                 login_data['csrf_access_token'])
     except Exception as e:
-        communication.telegram_bot_sendtext("{} Broker login Failed with err : {}".format(account['name'], str(e)))
+        result['success'] = False
+        result['error'] = str(e)
         return False
 
 
@@ -42,6 +43,9 @@ def login_angelone_algotest(broker_id, refresh_token, auth_token, feed_token, ac
         'X-CSRF-TOKEN-ACCESS': csrf_access_token
     }
     r = requests.get(url=url, headers=headers)
+    if r.status_code != 200:
+        raise errors.CustomError("AlgoTest AngelOne login failed : {}".format(r.text))
+
     data = r.json()
     print("AlgoTest AngelOne Login data : " + json.dumps(data))
     return r.status_code == 200
