@@ -64,7 +64,7 @@ def get_all_executions(login_data):
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36',
         'X-CSRF-TOKEN-ACCESS': csrf_access_token,
     }
-    r = requests.get(url=URL, headers=headers)
+    r = requests.get(url=url, headers=headers)
     data = r.json()
     return data
 
