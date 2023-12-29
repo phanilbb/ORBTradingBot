@@ -8,12 +8,12 @@
       },
       "broker": "angel_one",
       "broker_login": {
-        "api_key": "zlvYfBvA",
-        "secret_key": "a600f0b6-c5f6-412d-afe1-1dbd34dda6f3",
+        "api_key": "yIYZGimV",
+        "secret_key": "84007dd6-4e38-4a08-b879-4c7d86a11abd",
         "totp": "M3SAGK57IJCJIB5GH5NFG7DITI",
         "id": "L128041",
         "pin": "1703",
-        "broker_id": "650adc7dcd535bcba4bdbd71"
+        "broker_id": "658eb325703457853fa31505"
       },
       "strategies": [
         {
@@ -22,7 +22,7 @@
           "is_shared": false,
           "execution_type": "live",
           "broker_ids": [
-            "650adc7dcd535bcba4bdbd71"
+            "658eb325703457853fa31505"
           ]
         }
       ]
