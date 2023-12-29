@@ -1,0 +1,58 @@
+{
+  "accounts": [
+    {
+      "name": "Phani",
+      "algo_test_login": {
+        "phone_number": "+917032577833",
+        "password": "Phanindra173@"
+      },
+      "broker": "angel_one",
+      "broker_login": {
+        "api_key": "zlvYfBvA",
+        "secret_key": "a600f0b6-c5f6-412d-afe1-1dbd34dda6f3",
+        "totp": "M3SAGK57IJCJIB5GH5NFG7DITI",
+        "id": "L128041",
+        "pin": "1703",
+        "broker_id": "650adc7dcd535bcba4bdbd71"
+      },
+      "strategies": [
+        {
+          "name": "Phani account strategy",
+          "strategy": "64ec62f083ccaef84af929af",
+          "is_shared": false,
+          "execution_type": "live",
+          "broker_ids": [
+            "650adc7dcd535bcba4bdbd71"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Bindhiya",
+      "algo_test_login": {
+        "phone_number": "+917013376537",
+        "password": "jVChDH5zMg2@h3"
+      },
+      "broker": "angel_one",
+      "broker_login": {
+        "api_key": "2T5UkAjm",
+        "secret_key": "4c5f0347-f752-48ab-85b6-c43a6648d110",
+        "totp": "JICUAHK6OJMNYDPCR32BDV6SBQ",
+        "id": "K636871",
+        "pin": "1706",
+        "broker_id": "64f5637ed985163d05be2c94"
+      },
+      "strategies": [
+        {
+          "name": "Option Buying (2)",
+          "strategy": "645db6e8bab3f5e8b3254d17",
+          "is_shared": false,
+          "execution_type": "live",
+          "broker_ids": [
+            "64f5637ed985163d05be2c94"
+          ]
+        }
+      ]
+    }
+  ]
+}
