@@ -6,14 +6,14 @@ URL = "https://algotest.in/api/execution/start"
 
 
 def run(account, result):
-    print("Strategy Activation for account {}".format(account['name']))
     db_data = dynamo_db.get(account['name'])
     activated_strategies = db_data.get('strategies', [])
 
-    if len(account['strategies']) == activated_strategies:
+    if len(account['strategies']) == len(activated_strategies):
         result['notify'] = False
         return result
 
+    print("Strategy Activation for account {}".format(account['name']))
     for each_strategy in account['strategies']:
         try:
             if each_strategy['strategy'] not in activated_strategies:
