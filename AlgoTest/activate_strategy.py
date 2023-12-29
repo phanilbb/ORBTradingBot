@@ -7,23 +7,35 @@ URL = "https://algotest.in/api/execution/start"
 
 def run(account, result):
     print("Strategy Activation for account {}".format(account['name']))
+    db_data = dynamo_db.get(account['name'])
+    activated_strategies = db_data.get('strategies', [])
+
+    if len(account['strategies']) == activated_strategies:
+        result['notify'] = False
+        return result
+
     for each_strategy in account['strategies']:
         try:
-            login_data = dynamo_db.get(account['name'])
-            activate = get_activate_status(each_strategy, login_data)
-            if not activate:
-                print("strategy activation skipped")
-                continue
-            data = activate_strategy(each_strategy, login_data)
-            if data["msg"] == "Strategy successfully submitted for execution":
-                continue
-            else:
-                result['success'] = False
-                result['error'] = "{}' Activation Failed : {}".format(each_strategy['name'], data["msg"])
+            if each_strategy['strategy'] not in activated_strategies:
+                login_data = db_data['login_details']
+                activate = get_activate_status(each_strategy, login_data)
+                if not activate:
+                    print("strategy activation skipped")
+                    continue
+                data = activate_strategy(each_strategy, login_data)
+                if data["msg"] == "Strategy successfully submitted for execution":
+                    activated_strategies.append(each_strategy['strategy'])
+                    continue
+                else:
+                    result['success'] = False
+                    result['error'] = "{}' Activation Failed : {}".format(each_strategy['name'], data["msg"])
 
         except Exception as e:
             result['success'] = False
             result['error'] = "{}' Activation Failed : {}".format(each_strategy['name'], str(e))
+        finally:
+            db_data['strategies'] = activated_strategies
+            dynamo_db.save_item(db_data)
 
 
 def calculate_profit_loss(trades):

@@ -1,15 +1,17 @@
 import json
 import requests
 import dynamo_db
+import errors
 
 URL = "https://algotest.in/api/login"
 
 
 def run(account, result):
     try:
-        print("Logging in for account {}".format(account['name']))
-        login_data = login_algo_test(account['algo_test_login'])
-        dynamo_db.save(login_data, account['name'])
+        if not dynamo_db.get(account['name']).get('login_details'):
+            print("Logging in for account {}".format(account['name']))
+            login_data = login_algo_test(account['algo_test_login'])
+            dynamo_db.save(login_data, account['name'])
     except Exception as e:
         result['success'] = False
         result['error'] = "{} AlgoTest login Failed : {}".format(account['name'], str(e))
@@ -27,5 +29,7 @@ def login_algo_test(data):
         'Cookie': 'access_token_cookie=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTY5NTAyOTIyMCwianRpIjoiZmVjMmIzMDMtMjRjOS00MTFmLWI1Y2UtODZlNWUxZDQ2ZmRkIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjYzYWYwYThkMjY4YjFhOTlkZDAxMDVhNCIsIm5iZiI6MTY5NTAyOTIyMCwiY3NyZiI6IjA2NDk5MjBhLWY0ZWUtNDU4ZS1iYTMxLWExYWUzODIxMDBhMSIsImV4cCI6MTY5NTI4ODQyMH0.v4tRy5mvcyZInN03gtrvh3dtNV0NrYHwNs126df14rI; csrf_access_token=0649920a-f4ee-458e-ba31-a1ae382100a1'
     }
     r = requests.post(url=URL, headers=headers, data=payload)
+    if r.status_code != 200:
+        raise errors.CustomError("Login failed {}".format(r.text))
     print("Broker Login data : " + json.dumps(r.json()))
     return r.cookies.get_dict()

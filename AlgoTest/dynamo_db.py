@@ -15,11 +15,15 @@ def save(login_data, account):
     item = {
         'pk': get_pk(),
         'sk': account,
-        'login_details': login_data
+        'login_details': login_data,
+        'broker_login': False,
+        'strategies': []
     }
+    save_item(item)
 
-    response = ALGOTESTLOGIN.put_item(Item=item)
-    print(response)
+
+def save_item(item):
+    ALGOTESTLOGIN.put_item(Item=item)
 
 
 def get(account):
@@ -28,6 +32,6 @@ def get(account):
     )
 
     if data.get("Items"):
-        return data.get("Items")[0]['login_details']
+        return data.get("Items")[0]
 
     return {}

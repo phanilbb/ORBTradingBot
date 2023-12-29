@@ -18,16 +18,22 @@ def create_session(angel_one_details):
 
 def run(account, result):
     try:
-        print("Broker Logging in for account {}".format(account['name']))
-        login_data = dynamo_db.get(account['name'])
-        angel_one_details = account['broker_login']
-        broker_id = angel_one_details.get('broker_id')
-        data = create_session(angel_one_details)
-        refresh_token = data['data']['refreshToken']
-        auth_token = data['data']['accessToken']
-        feed_token = data['data']['feedToken']
-        login_angelone_algotest(broker_id, refresh_token, auth_token, feed_token, login_data['access_token_cookie'],
-                                login_data['csrf_access_token'])
+        db_data = dynamo_db.get(account['name'])
+        if not db_data.get('broker_login'):
+            print("Broker Logging in for account {}".format(account['name']))
+            login_data = db_data['login_details']
+            angel_one_details = account['broker_login']
+            broker_id = angel_one_details.get('broker_id')
+            data = create_session(angel_one_details)
+            refresh_token = data['data']['refreshToken']
+            auth_token = data['data']['accessToken']
+            feed_token = data['data']['feedToken']
+            if login_angelone_algotest(broker_id, refresh_token, auth_token, feed_token,
+                                       login_data['access_token_cookie'],
+                                       login_data['csrf_access_token']):
+                db_data['broker_login'] = True
+                dynamo_db.save_item(db_data)
+
     except Exception as e:
         result['success'] = False
         result['error'] = str(e)
