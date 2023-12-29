@@ -16,6 +16,7 @@ def create_session(angel_one_details):
     return data
 
 
+
 def run(account, result):
     try:
         db_data = dynamo_db.get(account['name'])
