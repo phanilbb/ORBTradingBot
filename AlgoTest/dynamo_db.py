@@ -1,4 +1,5 @@
 import time_helper
+import time
 import boto3
 from boto3.dynamodb.conditions import Key, Attr
 
@@ -10,14 +11,15 @@ def get_pk():
     return time_helper.get_current_date()
 
 
-def save(login_data, account):
+def save(login_data, account, ttl_seconds=2 * 24 * 60 * 60):
     print("Saving to account : " + str(login_data))
     item = {
         'pk': get_pk(),
         'sk': account,
         'login_details': login_data,
         'broker_login': False,
-        'strategies': []
+        'strategies': [],
+        'ttl': int(time.time()) + ttl_seconds
     }
     save_item(item)
 
