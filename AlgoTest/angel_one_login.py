@@ -3,19 +3,35 @@ import dynamo_db
 import json
 import pyotp
 import errors
-from SmartApi import SmartConnect
+import re
+import uuid
 
 URL = "https://algotest.in/api/broker_login/angelone_confirm/{}?auth_token={}&refresh_token={}"
+ANGEL_ONE_LOGIN_URL = "https://apiconnect.angelbroking.com/rest/auth/angelbroking/user/v1/loginByPassword"
 
 
 def create_session(angel_one_details):
-    smartApi = SmartConnect(angel_one_details['api_key'])
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-UserType': 'USER',
+        'X-SourceID': 'WEB',
+        'X-PrivateKey': angel_one_details['api_key'],
+        'X-ClientLocalIP': "127.0.0.1",
+        'X-ClientPublicIP': "106.193.147.98",
+        'X-MACAddress': ':'.join(re.findall('..', '%012x' % uuid.getnode())),
+    }
     totp = pyotp.TOTP(angel_one_details['totp'])
-    data = smartApi.generateSession(angel_one_details['id'], angel_one_details['pin'], totp.now())
-    print("Angle one login response : {}".format(str(data)))
-    userData = smartApi.getProfile(data['data']['refreshToken'])
-    print("Angle one User data response : {}".format(str(userData)))
-    return data
+    payload = {
+        'clientcode': angel_one_details['id'],
+        'password': angel_one_details['pin'],
+        'totp': str(totp.now())
+    }
+    r = requests.post(ANGEL_ONE_LOGIN_URL, data=json.dumps(payload), headers=headers)
+    print("Angle one login response : {}".format(r.text))
+    if r.status_code != 200:
+        raise errors.CustomError("Angle one login Failed {}".format(r.text))
+    return r.json()
 
 
 def run(account, result):
