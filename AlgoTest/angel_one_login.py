@@ -3,14 +3,12 @@ import dynamo_db
 import json
 import pyotp
 import errors
-import re
-import uuid
+from SmartApi import SmartConnect
 
 URL = "https://algotest.in/api/broker_login/angelone_confirm/{}?auth_token={}&refresh_token={}"
-ANGEL_ONE_LOGIN_URL = "https://apiconnect.angelbroking.com/rest/auth/angelbroking/user/v1/loginByPassword"
 
 
-def create_session_smartapi(angel_one_details):
+def create_session(angel_one_details):
     smartApi = SmartConnect(angel_one_details['api_key'])
     totp = pyotp.TOTP(angel_one_details['totp'])
     data = smartApi.generateSession(angel_one_details['id'], angel_one_details['pin'], totp.now())
@@ -18,53 +16,6 @@ def create_session_smartapi(angel_one_details):
     userData = smartApi.getProfile(data['data']['refreshToken'])
     print("Angle one User data response : {}".format(str(userData)))
     return data
-
-
-def create_session(angel_one_details):
-    headers = {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'X-UserType': 'USER',
-        'X-SourceID': 'WEB',
-        'X-PrivateKey': angel_one_details['api_key'],
-        'X-ClientLocalIP': "127.0.0.1",
-        'X-ClientPublicIP': "106.193.147.98",
-        'X-MACAddress': ':'.join(re.findall('..', '%012x' % uuid.getnode())),
-    }
-    totp = pyotp.TOTP(angel_one_details['totp'])
-    payload = {
-        'clientcode': angel_one_details['id'],
-        'password': angel_one_details['pin'],
-        'totp': str(totp.now())
-    }
-    r = requests.post(ANGEL_ONE_LOGIN_URL, data=json.dumps(payload), headers=headers)
-    print("Angle one login response : {}".format(r.text))
-    if r.status_code != 200:
-        raise errors.CustomError("Angle one login Failed {}".format(r.text))
-    return r.json()
-
-
-def get_profile(angel_one_details, jwtToken, refreshToken):
-    url = "https://apiconnect.angelbroking.com/rest/secure/angelbroking/user/v1/getProfile"
-    headers = {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'X-UserType': 'USER',
-        'X-SourceID': 'WEB',
-        'X-PrivateKey': angel_one_details['api_key'],
-        'X-ClientLocalIP': "127.0.0.1",
-        'X-ClientPublicIP': "106.193.147.98",
-        'X-MACAddress': ':'.join(re.findall('..', '%012x' % uuid.getnode())),
-        'Authorization': "Bearer {}".format(jwtToken)
-    }
-    params = {
-        'refreshToken': refreshToken
-    }
-    r = requests.get(url, headers=headers, data=params)
-    response = r.json()
-    if 'success' in response and not response['success']:
-        raise errors.CustomError(response['message'])
-    return response['status']
 
 
 def run(account, result):
