@@ -1,36 +1,83 @@
 import requests
 import dynamo_db
 import json
-from smartapi import SmartConnect
 import pyotp
 import errors
+import re
+import uuid
 
-URL = "https://algotest.in/api/broker_login/angelone_confirm/{}?auth_token={}&refresh_token={}&feed_token={}"
+URL = "https://algotest.in/api/broker_login/angelone_confirm/{}?auth_token={}&refresh_token={}"
+ANGEL_ONE_LOGIN_URL = "https://apiconnect.angelbroking.com/rest/auth/angelbroking/user/v1/loginByPassword"
+
+
+def create_session_smartapi(angel_one_details):
+    smartApi = SmartConnect(angel_one_details['api_key'])
+    totp = pyotp.TOTP(angel_one_details['totp'])
+    data = smartApi.generateSession(angel_one_details['id'], angel_one_details['pin'], totp.now())
+    print("Angle one login response : {}".format(str(data)))
+    userData = smartApi.getProfile(data['data']['refreshToken'])
+    print("Angle one User data response : {}".format(str(userData)))
+    return data
 
 
 def create_session(angel_one_details):
-    obj = SmartConnect(api_key=angel_one_details['api_key'], access_token=angel_one_details['secret_key'])
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-UserType': 'USER',
+        'X-SourceID': 'WEB',
+        'X-PrivateKey': angel_one_details['api_key'],
+        'X-ClientLocalIP': "127.0.0.1",
+        'X-ClientPublicIP': "106.193.147.98",
+        'X-MACAddress': ':'.join(re.findall('..', '%012x' % uuid.getnode())),
+    }
     totp = pyotp.TOTP(angel_one_details['totp'])
-    data = obj.generateSession(angel_one_details['id'], angel_one_details['pin'], str(totp.now()))
-    print("new session generated : {}".format(json.dumps(data)))
-    return data
+    payload = {
+        'clientcode': angel_one_details['id'],
+        'password': angel_one_details['pin'],
+        'totp': str(totp.now())
+    }
+    r = requests.post(ANGEL_ONE_LOGIN_URL, data=json.dumps(payload), headers=headers)
+    print("Angle one login response : {}".format(r.text))
+    if r.status_code != 200:
+        raise errors.CustomError("Angle one login Failed {}".format(r.text))
+    return r.json()
 
+
+def get_profile(angel_one_details, jwtToken, refreshToken):
+    url = "https://apiconnect.angelbroking.com/rest/secure/angelbroking/user/v1/getProfile"
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-UserType': 'USER',
+        'X-SourceID': 'WEB',
+        'X-PrivateKey': angel_one_details['api_key'],
+        'X-ClientLocalIP': "127.0.0.1",
+        'X-ClientPublicIP': "106.193.147.98",
+        'X-MACAddress': ':'.join(re.findall('..', '%012x' % uuid.getnode())),
+        'Authorization': "Bearer {}".format(jwtToken)
+    }
+    params = {
+        'refreshToken': refreshToken
+    }
+    r = requests.get(url, headers=headers, data=params)
+    response = r.json()
+    if 'success' in response and not response['success']:
+        raise errors.CustomError(response['message'])
+    return response['status']
 
 
 def run(account, result):
     try:
         db_data = dynamo_db.get(account['name'])
+        login_data = db_data['login_details']
+        angel_one_details = account['broker_login']
+
         if not db_data.get('broker_login'):
             print("Broker Logging in for account {}".format(account['name']))
-            login_data = db_data['login_details']
-            angel_one_details = account['broker_login']
-            broker_id = angel_one_details.get('broker_id')
             data = create_session(angel_one_details)
-            refresh_token = data['data']['refreshToken']
-            auth_token = data['data']['accessToken']
-            feed_token = data['data']['feedToken']
-            if login_angelone_algotest(broker_id, refresh_token, auth_token, feed_token,
-                                       login_data['access_token_cookie'],
+            if login_angelone_algotest(angel_one_details['broker_id'], data['data']['refreshToken'],
+                                       data['data']['jwtToken'], login_data['access_token_cookie'],
                                        login_data['csrf_access_token']):
                 db_data['broker_login'] = True
                 dynamo_db.save_item(db_data)
@@ -41,8 +88,8 @@ def run(account, result):
         return False
 
 
-def login_angelone_algotest(broker_id, refresh_token, auth_token, feed_token, access_token_cookie, csrf_access_token):
-    url = URL.format(broker_id, auth_token, refresh_token, feed_token)
+def login_angelone_algotest(broker_id, refresh_token, auth_token, access_token_cookie, csrf_access_token):
+    url = URL.format(broker_id, auth_token, refresh_token)
     headers = {
         'Accept': 'application/json, text/plain, */*',
         'Cookie': 'access_token_cookie=' + access_token_cookie + ';csrf_access_token=' + csrf_access_token,

@@ -55,7 +55,7 @@ def get_activate_status(strategy, login_data):
     if 'execute_after' not in strategy or not strategy['execute_after']:
         return True
     execution = get_execution(strategy['execute_after'], login_data)
-    if execution['status'] != 'square_off':
+    if not execution or execution['status'] != 'square_off':
         return False
     profit_loss = calculate_profit_loss(execution['trades'])
     return profit_loss < 0
