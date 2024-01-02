@@ -1,6 +1,7 @@
 import json
 import requests
 import dynamo_db
+import event_bridge
 
 URL = "https://algotest.in/api/execution/start"
 
@@ -11,6 +12,7 @@ def run(account, result):
 
     if len(account['strategies']) == len(activated_strategies):
         result['notify'] = False
+        event_bridge.stop_second_eventbridge_rule()
         return result
 
     print("Strategy Activation for account {}".format(account['name']))

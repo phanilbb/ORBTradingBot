@@ -4,6 +4,7 @@ import activate_strategy
 import communication
 import json
 import boto3
+import event_bridge
 
 ssm = boto3.client('ssm')
 
@@ -32,6 +33,8 @@ def lambda_handler(event, context):
         elif not result['success']:
             communication.telegram_bot_sendtext(
                 "{} - AlgoTest Failed : {}".format(each_account['name'], result['error']))
+
+    event_bridge.start_second_eventbridge_rule()
 
 
 if __name__ == '__main__':
