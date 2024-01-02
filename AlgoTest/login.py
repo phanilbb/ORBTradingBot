@@ -6,7 +6,7 @@ import errors
 URL = "https://algotest.in/api/login"
 
 
-def run(account, result):
+def run(account, result, combined_result):
     try:
         if not dynamo_db.get(account['name']).get('login_details'):
             print("Logging in for account {}".format(account['name']))

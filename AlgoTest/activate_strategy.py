@@ -6,13 +6,15 @@ import event_bridge
 URL = "https://algotest.in/api/execution/start"
 
 
-def run(account, result):
+def run(account, result, combined_result):
     db_data = dynamo_db.get(account['name'])
     activated_strategies = db_data.get('strategies', [])
 
+    combined_result['disable_rules'] = combined_result['disable_rules'] and len(account['strategies']) == len(
+        activated_strategies)
+
     if len(account['strategies']) == len(activated_strategies):
         result['notify'] = False
-        event_bridge.stop_second_eventbridge_rule()
         return result
 
     print("Strategy Activation for account {}".format(account['name']))

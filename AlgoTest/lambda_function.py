@@ -18,6 +18,10 @@ def lambda_handler(event, context):
     input_data = get_input_payload()
     accounts = input_data.get('accounts', [])
 
+    combined_result = {
+        'disable_rules': True
+    }
+
     for each_account in accounts:
         result = {
             'success': True,
@@ -26,7 +30,7 @@ def lambda_handler(event, context):
         }
         for process in [login.run, angel_one_login.run, activate_strategy.run]:
             if result['success']:
-                process(each_account, result)
+                process(each_account, result, combined_result)
 
         if result['success'] and result['notify']:
             communication.telegram_bot_sendtext("{} - AlgoTest Successful".format(each_account['name']))
@@ -35,6 +39,9 @@ def lambda_handler(event, context):
                 "{} - AlgoTest Failed : {}".format(each_account['name'], result['error']))
 
     event_bridge.start_second_eventbridge_rule()
+
+    if combined_result['disable_rules']:
+        event_bridge.stop_second_eventbridge_rule()
 
 
 if __name__ == '__main__':
