@@ -5,6 +5,7 @@ import communication
 import json
 import boto3
 import event_bridge
+import recharge
 
 ssm = boto3.client('ssm')
 
@@ -28,7 +29,7 @@ def lambda_handler(event, context):
             'error': None,
             'notify': True
         }
-        for process in [login.run, angel_one_login.run, activate_strategy.run]:
+        for process in [login.run, recharge.run, angel_one_login.run, activate_strategy.run]:
             if result['success']:
                 process(each_account, result, combined_result)
 
