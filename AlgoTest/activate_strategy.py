@@ -1,7 +1,7 @@
 import json
 import requests
 import dynamo_db
-import event_bridge
+import trade_executions
 
 URL = "https://algotest.in/api/execution/start"
 
@@ -9,9 +9,6 @@ URL = "https://algotest.in/api/execution/start"
 def run(account, result, combined_result):
     db_data = dynamo_db.get(account['name'])
     activated_strategies = db_data.get('strategies', [])
-
-    combined_result['disable_rules'] = combined_result['disable_rules'] and len(account['strategies']) == len(
-        activated_strategies)
 
     if len(account['strategies']) == len(activated_strategies):
         result['notify'] = False
@@ -58,34 +55,11 @@ def calculate_profit_loss(trades):
 def get_activate_status(strategy, login_data):
     if 'execute_after' not in strategy or not strategy['execute_after']:
         return True
-    execution = get_execution(strategy['execute_after'], login_data)
+    execution = trade_executions.get(strategy['execute_after'], login_data)
     if not execution or execution['status'] != 'square_off':
         return False
     profit_loss = calculate_profit_loss(execution['trades'])
     return profit_loss < 0
-
-
-def get_all_executions(login_data):
-    url = 'https://algotest.in/api/execution/executions'
-    access_token_cookie = login_data['access_token_cookie']
-    csrf_access_token = login_data['csrf_access_token']
-    headers = {
-        'Content-Type': 'application/json',
-        'Cookie': 'access_token_cookie=' + access_token_cookie + ';csrf_access_token=' + csrf_access_token,
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36',
-        'X-CSRF-TOKEN-ACCESS': csrf_access_token,
-    }
-    r = requests.get(url=url, headers=headers)
-    data = r.json()
-    return data
-
-
-def get_execution(strategy_id, login_data):
-    data = get_all_executions(login_data)
-    for each in data:
-        if each['strategy_id'] == strategy_id:
-            return each
-    return {}
 
 
 def activate_strategy(strategy, login_data):

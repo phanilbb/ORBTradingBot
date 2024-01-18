@@ -34,7 +34,7 @@ def create_session(angel_one_details):
     return r.json()
 
 
-def run(account, result, combined_result):
+def run(account, result):
     try:
         db_data = dynamo_db.get(account['name'])
         login_data = db_data['login_details']

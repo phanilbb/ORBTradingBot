@@ -45,7 +45,7 @@ def subscribe_plans(access_token_cookie, csrf_access_token):
     return r.status_code == 200
 
 
-def run(account, result, combined_result):
+def run(account, result):
     try:
         db_data = dynamo_db.get(account['name'])
         login_data = db_data['login_details']
