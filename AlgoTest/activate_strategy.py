@@ -6,7 +6,7 @@ import trade_executions
 URL = "https://algotest.in/api/execution/start"
 
 
-def run(account, result, combined_result):
+def run(account, result):
     db_data = dynamo_db.get(account['name'])
     activated_strategies = db_data.get('strategies', [])
 
