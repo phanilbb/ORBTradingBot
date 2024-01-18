@@ -22,7 +22,11 @@ def lambda_handler(event, context):
         print("Not in strategy activation time")
         return
 
-    input_data = get_input_payload()
+    if not event:
+        input_data = get_input_payload()
+    else:
+        input_data = event
+
     accounts = input_data.get('accounts', [])
 
     for each_account in accounts:
