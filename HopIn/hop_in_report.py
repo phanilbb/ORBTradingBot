@@ -280,7 +280,7 @@ def push_to_excel_payment_types(payment_types_response):
 
 def telegram_bot_sendtext(bot_message):
     bot_token = '7194587495:AAGOhw2lKEupuU4mZa9BjmzciA5kCPNVakk'
-    bot_chatID = '1170124746'
+    bot_chatID = '-4102625159'
     send_text = 'https://api.telegram.org/bot' + bot_token + '/sendMessage?chat_id=' + bot_chatID + '&parse_mode=HTML&text=' + bot_message
 
     response = requests.get(send_text)
@@ -316,12 +316,12 @@ def get_monthly_report_dates():
 
 def send_instock_message(items_response):
     headers = ["Item", "Stock"]
-    spaces = [32, 6]
+    spaces = [26, 6]
     data = []
     for each_item in items_response['wares']:
         if each_item['category'] != 'Raw materials':
             continue
-        name = each_item['name'].lstrip('X - ')
+        name = each_item['name'].lstrip('X - ').rsplit(' ', 1)[0]
         data.append([name, str(each_item['count'] / 1000)])
 
     table = create_table(headers, data, spaces)
