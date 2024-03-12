@@ -15,3 +15,7 @@ def is_algotest_strategy_activation_time():
     current_time = datetime.now().time()
     target_time = time(8, 45)
     return current_time >= target_time
+
+
+def get_current_day():
+    return datetime.now().strftime('%A').lower()

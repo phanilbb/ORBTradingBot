@@ -2,6 +2,7 @@ import json
 import requests
 import dynamo_db
 import trade_executions
+import time_helper
 
 URL = "https://algotest.in/api/execution/start"
 
@@ -53,6 +54,9 @@ def calculate_profit_loss(trades):
 
 
 def get_activate_status(strategy, login_data):
+    current_day = time_helper.get_current_day()
+    if not strategy['weekdays'].get(current_day, False):
+        return False
     if 'execute_after' not in strategy or not strategy['execute_after']:
         return True
     execution = trade_executions.get(strategy['execute_after'], login_data)
