@@ -19,6 +19,7 @@ def save(login_data, account, ttl_seconds=2 * 24 * 60 * 60):
         'login_details': login_data,
         'broker_login': False,
         'strategies': [],
+        'skipped_strategies': [],
         'ttl': int(time.time()) + ttl_seconds,
         'plan_found': False
     }

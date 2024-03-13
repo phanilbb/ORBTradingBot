@@ -10,8 +10,9 @@ URL = "https://algotest.in/api/execution/start"
 def run(account, result):
     db_data = dynamo_db.get(account['name'])
     activated_strategies = db_data.get('strategies', [])
+    skipped_strategies = db_data.get('skipped_strategies', [])
 
-    if len(account['strategies']) == len(activated_strategies):
+    if len(account['strategies']) == len(activated_strategies) + len(skipped_strategies):
         result['notify'] = False
         return result
 
@@ -22,6 +23,7 @@ def run(account, result):
                 login_data = db_data['login_details']
                 activate = get_activate_status(each_strategy, login_data)
                 if not activate:
+                    skipped_strategies.append(each_strategy['strategy'])
                     print("strategy activation skipped")
                     continue
                 data = activate_strategy(each_strategy, login_data)
@@ -37,6 +39,7 @@ def run(account, result):
             result['error'] = "{}' Activation Failed : {}".format(each_strategy['name'], str(e))
         finally:
             db_data['strategies'] = activated_strategies
+            db_data['skipped_strategies'] = skipped_strategies
             dynamo_db.save_item(db_data)
 
 
@@ -67,6 +70,7 @@ def get_activate_status(strategy, login_data):
 
 
 def activate_strategy(strategy, login_data):
+    del strategy['weekdays']
     access_token_cookie = login_data['access_token_cookie']
     csrf_access_token = login_data['csrf_access_token']
     payload = json.dumps(strategy)
