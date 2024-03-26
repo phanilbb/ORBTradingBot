@@ -9,6 +9,12 @@ DAILY_REPORT_TEMPLATE = '''Daily Report - {}
 </pre>
 '''
 
+TODAY_REPORT_TEMPLATE = '''Today's Report - {}
+<pre>
+{}
+</pre>
+'''
+
 IN_STOCK_REPORT_TEMPLATE = '''In Stock Report - {}
 <pre>
 {}
@@ -91,9 +97,8 @@ def login():
     return r.cookies.get_dict()
 
 
-def get_receipt_report(cookies):
+def get_receipt_report(cookies, current_date=datetime.now().strftime('%Y-%m-%d')):
     url = "https://r.loyverse.com/data/ownercab/getreceiptsarchive"
-    current_date = datetime.now().strftime('%Y-%m-%d')
     payload = {
         "limit": "100",
         "offset": 0,
@@ -351,9 +356,34 @@ def send_daily_report_message(payment_types_response_daily, payment_types_respon
     telegram_bot_sendtext(DAILY_REPORT_TEMPLATE.format(datetime.now().strftime('%d-%m-%y'), table))
 
 
-def run():
+def send_todays_report_message(payment_types_response_daily):
+    headers = ["Category", "Amount"]
+    spaces = [16, 10]
+    data = []
+
+    for each_type in payment_types_response_daily['items']:
+        data.append([each_type['paymentTypeName'], str(each_type['totalCollected'] / 100)])
+
+    dailyCollected = payment_types_response_daily['total']['totalCollected'] / 100
+
+    data.append(["-" * spaces[0], '-' * spaces[1]])
+    data.append(["Total", str(dailyCollected)])
+    data.append(["-" * spaces[0], '-' * spaces[1]])
+
+    table = create_table(headers, data, spaces)
+    telegram_bot_sendtext(TODAY_REPORT_TEMPLATE.format(datetime.now().strftime('%d-%m-%y'), table))
+
+
+def run(event):
     # cookies = login()
     # print(cookies)
+
+    if event and event.get('report') == 'daily':
+        fromDate, toDate = get_daily_report_dates()
+        payment_types_response_daily = get_payment_types(COOKIES, fromDate, toDate)
+        send_todays_report_message(payment_types_response_daily)
+        return
+
     items_response = get_items(COOKIES)
     receipt_response = get_receipt_report(COOKIES)
     push_to_excel(receipt_response, items_response)
