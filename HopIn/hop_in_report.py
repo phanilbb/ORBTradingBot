@@ -372,7 +372,7 @@ def send_todays_report_message(payment_types_response_daily):
     data.append(["-" * spaces[0], '-' * spaces[1]])
 
     table = create_table(headers, data, spaces)
-    telegram_bot_sendtext(TODAY_REPORT_TEMPLATE.format(datetime.now().strftime('%d-%m-%y'), table))
+    telegram_bot_sendtext(TODAY_REPORT_TEMPLATE.format(str(dailyCollected), table))
 
 
 def run(event):
