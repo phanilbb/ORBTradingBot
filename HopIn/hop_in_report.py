@@ -364,7 +364,8 @@ def send_todays_report_message(payment_types_response_daily):
     for each_type in payment_types_response_daily['items']:
         data.append([each_type['paymentTypeName'], str(each_type['totalCollected'] / 100)])
 
-    dailyCollected = payment_types_response_daily['total']['totalCollected'] / 100
+    dailyCollected = payment_types_response_daily['total']['totalCollected'] / 100 if payment_types_response_daily[
+        'total'] else 0
 
     data.append(["-" * spaces[0], '-' * spaces[1]])
     data.append(["Total", str(dailyCollected)])
