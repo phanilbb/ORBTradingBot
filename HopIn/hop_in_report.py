@@ -2,6 +2,7 @@ import json
 from datetime import datetime, timedelta
 import gspread
 import requests
+import boto3
 
 DAILY_REPORT_TEMPLATE = '''Daily Report - {}
 <pre>
@@ -21,11 +22,7 @@ IN_STOCK_REPORT_TEMPLATE = '''In Stock Report - {}
 </pre>
 '''
 
-COOKIES = {
-    'AWSALB': 'N1NDF/cTUayEAfZWnrUI8iMr93f+gcUPLvERMwLNRac/qxZkADO57u6w+zVO69wDIbWqqTup99zcrbReO3glFgexrmHlDAlAhxkclyIXLasYNRwF7cOggsEPvr5C',
-    'AWSALBCORS': 'N1NDF/cTUayEAfZWnrUI8iMr93f+gcUPLvERMwLNRac/qxZkADO57u6w+zVO69wDIbWqqTup99zcrbReO3glFgexrmHlDAlAhxkclyIXLasYNRwF7cOggsEPvr5C',
-    'JSESSIONID': 'node01bo3xzphuxak289ciz4n300mh113010.node0', 'ownercub-lls': 'feac9b06-3aad-4b42-abce-c6c05f95565b'
-}
+PARAMETERS_KEY = "loyverse_config"
 
 
 def transform_to_characters(text, count):
@@ -72,6 +69,7 @@ def recaptcha():
 
 
 def login():
+    print("Logging In")
     code = recaptcha()
     url = "https://r.loyverse.com/data/cabinetlogin"
     payload = {
@@ -94,6 +92,7 @@ def login():
     r = requests.post(url=url, headers=headers, data=json.dumps(payload))
     print(r.status_code)
     print(r.cookies.get_dict())
+    update_parameter(PARAMETERS_KEY, r.cookies.get_dict())
     return r.cookies.get_dict()
 
 
@@ -233,6 +232,9 @@ def get_payment_types(cookies, fromDate, toDate):
     r = requests.post(url=url, data=json.dumps(payload), headers=headers)
     if r.status_code == 200:
         return r.json()
+
+    if r.status_code == 403:
+        login()
 
     return {}
 
@@ -375,29 +377,47 @@ def send_todays_report_message(payment_types_response_daily):
     telegram_bot_sendtext(TODAY_REPORT_TEMPLATE.format(str(dailyCollected), table))
 
 
+def get_input_payload(name):
+    ssm = boto3.client('ssm')
+    response = ssm.get_parameter(Name=name, WithDecryption=False)
+    return json.loads(response['Parameter']['Value'])
+
+
+def update_parameter(name, value):
+    ssm = boto3.client('ssm')
+    json_value = json.dumps(value)
+    response = ssm.put_parameter(
+        Name=name,
+        Value=json_value,
+        Overwrite=True,
+        Type='String'
+    )
+    print(response)
+    return response
+
+
 def run(event):
-    # cookies = login()
-    # print(cookies)
+    cookies = get_input_payload(PARAMETERS_KEY)
 
     if event and event.get('report') == 'daily':
         fromDate, toDate = get_daily_report_dates()
-        payment_types_response_daily = get_payment_types(COOKIES, fromDate, toDate)
+        payment_types_response_daily = get_payment_types(cookies, fromDate, toDate)
         send_todays_report_message(payment_types_response_daily)
         return
 
-    items_response = get_items(COOKIES)
-    receipt_response = get_receipt_report(COOKIES)
+    items_response = get_items(cookies)
+    receipt_response = get_receipt_report(cookies)
     push_to_excel(receipt_response, items_response)
 
     fromDate, toDate = get_daily_report_dates()
-    payment_types_response_daily = get_payment_types(COOKIES, fromDate, toDate)
+    payment_types_response_daily = get_payment_types(cookies, fromDate, toDate)
     push_to_excel_payment_types(payment_types_response_daily)
 
     fromDate, toDate = get_weekly_report_dates()
-    payment_types_response_weekly = get_payment_types(COOKIES, fromDate, toDate)
+    payment_types_response_weekly = get_payment_types(cookies, fromDate, toDate)
 
     fromDate, toDate = get_monthly_report_dates()
-    payment_types_response_monthly = get_payment_types(COOKIES, fromDate, toDate)
+    payment_types_response_monthly = get_payment_types(cookies, fromDate, toDate)
 
     send_daily_report_message(payment_types_response_daily, payment_types_response_weekly,
                               payment_types_response_monthly)
