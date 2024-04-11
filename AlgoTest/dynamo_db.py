@@ -21,7 +21,8 @@ def save(login_data, account, ttl_seconds=2 * 24 * 60 * 60):
         'strategies': [],
         'skipped_strategies': [],
         'ttl': int(time.time()) + ttl_seconds,
-        'plan_found': False
+        'plan_found': False,
+        'holiday': None
     }
     save_item(item)
 

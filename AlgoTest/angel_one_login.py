@@ -5,6 +5,7 @@ import pyotp
 import errors
 import re
 import uuid
+import market_holiday
 
 URL = "https://algotest.in/api/broker_login/angelone_confirm/{}?auth_token={}&refresh_token={}"
 ANGEL_ONE_LOGIN_URL = "https://apiconnect.angelbroking.com/rest/auth/angelbroking/user/v1/loginByPassword"
@@ -40,6 +41,9 @@ def run(account, result):
         login_data = db_data['login_details']
         angel_one_details = account['broker_login']
 
+        if 'holiday' in db_data and db_data['holiday']:
+            return
+
         if not db_data.get('broker_login'):
             print("Broker Logging in for account {}".format(account['name']))
             data = create_session(angel_one_details)
@@ -52,6 +56,7 @@ def run(account, result):
     except Exception as e:
         result['success'] = False
         result['error'] = str(e)
+        result['holiday'] = market_holiday.is_holiday(login_data)
         return False
 
 

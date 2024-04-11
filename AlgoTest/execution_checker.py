@@ -8,6 +8,9 @@ def run(account, result):
         db_data = dynamo_db.get(account['name'])
         login_data = db_data['login_details']
 
+        if 'holiday' in db_data and db_data['holiday']:
+            return
+
         executions = trade_executions.get_all(login_data)
 
         for execution in executions:

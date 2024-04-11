@@ -55,6 +55,9 @@ def run(account, result):
             print("Plan details found")
             return
 
+        if 'holiday' in db_data and db_data['holiday']:
+            return
+
         plan_data = get_plans(login_data['access_token_cookie'], login_data['csrf_access_token'])
 
         if not plan_data['expiration'] or time_helper.is_before_current_time(plan_data['expiration']):

@@ -9,6 +9,7 @@ import execution_checker
 import login
 import recharge
 import time_helper
+import market_holiday
 
 
 def get_input_payload():
@@ -29,13 +30,18 @@ def lambda_handler(event, context):
         result = {
             'success': True,
             'error': None,
-            'notify': True
+            'notify': True,
+            'holiday': False
         }
-        for process in [login.run, recharge.run, angel_one_login.run, activate_strategy.run, execution_checker.run]:
+
+        for process in [market_holiday.run, login.run, recharge.run, angel_one_login.run, activate_strategy.run,
+                        execution_checker.run]:
             if result['success']:
                 process(each_account, result)
 
-        if result['success'] and result['notify']:
+        if result['holiday'] and result['notify']:
+            communication.telegram_bot_sendtext("Market Holiday Today")
+        elif result['success'] and result['notify']:
             communication.telegram_bot_sendtext("{} - AlgoTest Successful".format(each_account['name']))
         elif not result['success']:
             communication.telegram_bot_sendtext(

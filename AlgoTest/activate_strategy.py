@@ -16,6 +16,9 @@ def run(account, result):
         result['notify'] = False
         return result
 
+    if 'holiday' in db_data and db_data['holiday']:
+        return
+
     print("Strategy Activation for account {}".format(account['name']))
     for each_strategy in account['strategies']:
         try:
