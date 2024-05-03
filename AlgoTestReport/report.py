@@ -33,7 +33,7 @@ class Report:
         gc.open('Trades').worksheet('2024').update_cell(row_number, 3, round(pnl, 2))
 
         comm = communication.Communication()
-        comm.telegram_bot_sendtext("Updated the Sheet for today")
+        comm.send_telegram_msg("Updated the Sheet for today")
 
     def get_charges(self, bp, sp, qty):
         brokerage = 40
