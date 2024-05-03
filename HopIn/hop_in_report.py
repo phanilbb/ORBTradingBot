@@ -26,6 +26,7 @@ PARAMETERS_KEY = "loyverse_config"
 
 
 def transform_to_characters(text, count):
+    text = str(text)
     original_length = len(text)
     if original_length >= count:
         return text
@@ -39,16 +40,24 @@ def transform_to_characters(text, count):
 
 
 def create_table(headers, data, space_formats):
-    a = ''
-    a += "|{}|{}|\n".format(transform_to_characters(headers[0], space_formats[0]),
-                            transform_to_characters(headers[1], space_formats[1]))
-    a += "|{}|{}|\n".format(transform_to_characters('-' * space_formats[0], space_formats[0]),
-                            transform_to_characters('-' * space_formats[1], space_formats[1]))
+    # Initialize an empty string to store the table
+    table = ''
 
-    for each_data in data:
-        a += "|{}|{}|\n".format(transform_to_characters(each_data[0], space_formats[0]),
-                                transform_to_characters(each_data[1], space_formats[1]))
-    return a
+    # Create the header row
+    header_row = '|'.join([transform_to_characters(header, space_formats[i]) for i, header in enumerate(headers)])
+    table += f"{header_row}|\n"
+
+    # Create the separator row
+    separator_row = '|'.join(
+        [transform_to_characters('-' * space_formats[i], space_formats[i]) for i in range(len(headers))])
+    table += f"{separator_row}|\n"
+
+    # Create rows for each data entry
+    for row_data in data:
+        data_row = '|'.join([transform_to_characters(row_data[i], space_formats[i]) for i in range(len(headers))])
+        table += f"{data_row}|\n"
+
+    return table
 
 
 def recaptcha():
