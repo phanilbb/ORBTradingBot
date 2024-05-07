@@ -68,7 +68,7 @@ def recaptcha():
     try:
         result = solver.solve_captcha(
             site_key=key,
-            page_url='https://loyverse.com/en/login')
+            page_url='https://r.loyverse.com/data/cabinetlogin')
 
         print(result)
         return result
