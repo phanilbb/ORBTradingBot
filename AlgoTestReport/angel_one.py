@@ -8,6 +8,7 @@ import requests
 class AngelOne:
     login_url = "https://apiconnect.angelbroking.com/rest/auth/angelbroking/user/v1/loginByPassword"
     pos_url = 'https://apiconnect.angelbroking.com/rest/secure/angelbroking/order/v1/getPosition'
+    order_book_url = 'https://apiconnect.angelbroking.com/rest/secure/angelbroking/order/v1/getOrderBook'
     charges_url = 'https://apiconnect.angelbroking.com/rest/secure/angelbroking/brokerage/v1/estimateCharges'
     login_data = None
     api_key = None
@@ -44,6 +45,14 @@ class AngelOne:
             return None
         return r.json()
 
+    def get_order_book(self):
+        r = requests.get(self.order_book_url, headers=self.get_request_headers())
+        print("Get Order Book response : {}".format(r.text))
+        if r.status_code != 200:
+            print("Get Positions API failed")
+            return None
+        return r.json()
+
     def get_request_headers(self):
         return {
             'Authorization': 'Bearer {}'.format(self.login_data['data']['jwtToken']),
@@ -57,30 +66,24 @@ class AngelOne:
             'X-MACAddress': ':'.join(re.findall('..', '%012x' % uuid.getnode())),
         }
 
-    def get_estimated_charges(self, pos):
+    def get_estimated_charges(self, order_book, pos):
+
+        token_symbol_map = {}
+
+        for each_pos in pos.get('data', []):
+            token_symbol_map[each_pos['symboltoken']] = each_pos['symbolname']
 
         orders = []
-        for each_pos in pos.get('data', []):
-            buy_order = {
-                "product_type": each_pos['producttype'],
-                "transaction_type": "BUY",
-                "quantity": each_pos['buyqty'],
-                "price": each_pos['totalbuyavgprice'],
-                "exchange": each_pos['exchange'],
-                "symbol_name": each_pos['symbolname'],
-                "token": each_pos['symboltoken']
-            }
-            sell_order = {
-                "product_type": each_pos['producttype'],
-                "transaction_type": "SELL",
-                "quantity": each_pos['sellqty'],
-                "price": each_pos['sellavgprice'],
-                "exchange": each_pos['exchange'],
-                "symbol_name": each_pos['symbolname'],
-                "token": each_pos['symboltoken']
-            }
-            orders.append(buy_order)
-            orders.append(sell_order)
+        for each_order in order_book.get('data', []):
+            orders.append({
+                "product_type": each_order['producttype'],
+                "transaction_type": each_order['transactiontype'],
+                "quantity": each_order['quantity'],
+                "price": each_order['price'],
+                "exchange": each_order['exchange'],
+                "symbol_name": token_symbol_map.get(each_order['symboltoken'], each_order['tradingsymbol']),
+                "token": each_order['symboltoken']
+            })
 
         payload = {
             'orders': orders

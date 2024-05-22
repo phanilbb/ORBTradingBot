@@ -28,7 +28,8 @@ class Report:
             amount = float(each['buyqty']) * (float(each['totalsellavgprice']) - float(each['totalbuyavgprice']))
             pnl += amount
 
-        charges = angelOneObj.get_estimated_charges(pos)
+        order_book = angelOneObj.get_order_book()
+        charges = angelOneObj.get_estimated_charges(order_book, pos)
         pnl -= charges
 
         print("Updating the column")
