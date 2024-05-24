@@ -1,0 +1,21 @@
+import algotest
+import time_helper
+import communication
+
+
+def lambda_handler(event, context):
+    algo = algotest.AlgoTest()
+    algo.login_algo_test(event)
+    comm = communication.Communication()
+
+    plan_data = algo.get_plans()
+
+    if not plan_data['expiration'] or time_helper.is_within_days(plan_data['expiration'], -2):
+        print("Plan Expired | Subscribing to plans")
+        subscribe_plans = algo.subscribe_plans()
+        if subscribe_plans:
+            comm.send_telegram_msg("Plan Recharge Successful")
+        else:
+            comm.send_telegram_msg("Plan Recharge Failed")
+    else:
+        comm.send_telegram_msg("Active plan found")

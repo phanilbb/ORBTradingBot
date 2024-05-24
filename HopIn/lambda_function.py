@@ -1,5 +1,5 @@
-from HopIn import swiggy_report
-from HopIn import hop_in_report
+import swiggy_report
+import hop_in_report
 
 
 def lambda_handler(event, context):

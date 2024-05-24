@@ -27,7 +27,7 @@ def subscribe_plans(access_token_cookie, csrf_access_token):
         "plans": {
             "external_connect": False,
             "live_execution": {
-                "max_strategies": 2
+                "max_strategies": 1
             }
         }
     }
