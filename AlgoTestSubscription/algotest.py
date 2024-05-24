@@ -41,7 +41,7 @@ class AlgoTest:
         return r.cookies.get_dict()
 
     def get_plans(self):
-        r = requests.get(url=self.plan_url, headers=self.get_headers())
+        r = requests.get(url=self.renew_plan_url, headers=self.get_headers())
         if r.status_code != 200:
             print("Get Plans failed {}".format(r.text))
         print("Get Plan data : " + json.dumps(r.json()))
