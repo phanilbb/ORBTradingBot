@@ -36,4 +36,6 @@ class Report:
         gc.open('Trades').worksheet('2024').update_cell(row_number, 3, round(pnl, 2))
 
         comm = communication.Communication()
+        if charges == 0:
+            comm.send_telegram_msg("Estimated charges failed")
         comm.send_telegram_msg("Updated the Sheet for today")

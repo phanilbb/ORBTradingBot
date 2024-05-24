@@ -91,7 +91,7 @@ class AngelOne:
 
         r = requests.post(self.charges_url, data=json.dumps(payload), headers=self.get_request_headers())
         print("Estimate charges response : {}".format(r.text))
-        if r.status_code != 200:
+        if r.status_code != 200 or not r.json() or not r.json().get('data'):
             print("Estimate charges failed")
-            return None
-        return r.json()['data']['summary']['total_charges']
+            return 0
+        return r.json().get('data', {}).get('summary', {}).get('total_charges', 0)
