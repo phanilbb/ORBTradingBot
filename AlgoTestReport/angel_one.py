@@ -93,5 +93,5 @@ class AngelOne:
         print("Estimate charges response : {}".format(r.text))
         if r.status_code != 200 or not r.json() or not r.json().get('data'):
             print("Estimate charges failed")
-            return 0
+            return len(order_book.get('data', [])) * 20 + 100
         return r.json().get('data', {}).get('summary', {}).get('total_charges', 0)
