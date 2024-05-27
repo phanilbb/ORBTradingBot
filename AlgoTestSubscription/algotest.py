@@ -40,8 +40,15 @@ class AlgoTest:
         self.csrf_access_token = cookies.get('csrf_access_token', None)
         return r.cookies.get_dict()
 
-    def get_plans(self):
+    def get_renew_plans(self):
         r = requests.get(url=self.renew_plan_url, headers=self.get_headers())
+        if r.status_code != 200:
+            print("Get Renew Plans failed {}".format(r.text))
+        print("Get Renew Plan data : " + json.dumps(r.json()))
+        return r.json()
+
+    def get_plans(self):
+        r = requests.get(url=self.plan_url, headers=self.get_headers())
         if r.status_code != 200:
             print("Get Plans failed {}".format(r.text))
         print("Get Plan data : " + json.dumps(r.json()))
