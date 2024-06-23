@@ -19,4 +19,4 @@ def lambda_handler(event, context):
         else:
             comm.send_telegram_msg("Plan Recharge Failed")
     else:
-        comm.send_telegram_msg("Active plan found")
+        comm.send_telegram_msg("Active plan found with expiry : {}".format(expiration))
