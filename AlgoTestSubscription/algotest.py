@@ -54,6 +54,22 @@ class AlgoTest:
         print("Get Plan data : " + json.dumps(r.json()))
         return r.json()
 
+    def renew_plans(self):
+        payload = {
+            "plans": {
+                "live_execution": {
+                    "max_strategies": 1
+                }
+            }
+        }
+        headers = self.get_headers()
+        headers['Content-Type'] = 'application/json'
+        r = requests.post(url=self.renew_plan_url, headers=headers, data=json.dumps(payload))
+        if r.status_code != 200:
+            print("Subscribe Renew Plans failed {}".format(r.text))
+        print("Subscribe Renew Plans data : " + json.dumps(r.json()))
+        return r.status_code == 200
+
     def subscribe_plans(self):
         payload = {
             "plans": {
@@ -62,8 +78,10 @@ class AlgoTest:
                 }
             }
         }
-        r = requests.post(url=self.renew_plan_url, headers=self.get_headers(), data=json.dumps(payload))
+        headers = self.get_headers()
+        headers['Content-Type'] = 'application/json'
+        r = requests.post(url=self.plan_url, headers=headers, data=json.dumps(payload))
         if r.status_code != 200:
             print("Subscribe Plans failed {}".format(r.text))
         print("Subscribe Plans data : " + json.dumps(r.json()))
-        return r.json()
+        return r.status_code == 200

@@ -13,7 +13,7 @@ def lambda_handler(event, context):
 
     if not expiration or time_helper.is_within_days(expiration, -2):
         print("Plan Expired | Subscribing to plans")
-        subscribe_plans = algo.subscribe_plans()
+        subscribe_plans = algo.renew_plans() or algo.subscribe_plans()
         if subscribe_plans:
             comm.send_telegram_msg("Plan Recharge Successful")
         else:
