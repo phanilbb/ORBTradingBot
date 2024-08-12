@@ -35,7 +35,7 @@ class Report:
         print("Updating the column")
         sheet = gc.open('Trades').worksheet('2024')
         sheet.update_cell(row_number, 3, round(profit, 2))
-        sheet.update_cell(row_number, 4, round(charges, 2))
+        sheet.update_cell(row_number, 4, round(-charges, 2))
         sheet.update_cell(row_number, 5, round(pnl, 2))
 
         comm = communication.Communication()
