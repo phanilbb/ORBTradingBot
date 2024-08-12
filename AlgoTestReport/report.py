@@ -23,17 +23,20 @@ class Report:
         difference = today_date - reference_date
         row_number = difference.days + 1
 
-        pnl = 0
+        profit = 0
         for each in pos['data']:
             amount = float(each['buyqty']) * (float(each['totalsellavgprice']) - float(each['totalbuyavgprice']))
-            pnl += amount
+            profit += amount
 
         order_book = angelOneObj.get_order_book()
         charges = angelOneObj.get_estimated_charges(order_book, pos)
-        pnl -= charges
+        pnl = profit - charges
 
         print("Updating the column")
-        gc.open('Trades').worksheet('2024').update_cell(row_number, 3, round(pnl, 2))
+        sheet = gc.open('Trades').worksheet('2024')
+        sheet.update_cell(row_number, 3, round(profit, 2))
+        sheet.update_cell(row_number, 4, round(charges, 2))
+        sheet.update_cell(row_number, 5, round(pnl, 2))
 
         comm = communication.Communication()
         if charges == 0:
