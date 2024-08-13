@@ -20,6 +20,11 @@ class Screenshot:
         self.password = data['password']
         self.options = webdriver.ChromeOptions()
         self.options.add_argument('headless')
+        self.options.binary_location = '/opt/headless-chromium'
+        self.options.add_argument('--headless')
+        self.options.add_argument('--no-sandbox')
+        self.options.add_argument('--single-process')
+        self.options.add_argument('--disable-dev-shm-usage')
 
     def init_login(self):
         print("Login init")

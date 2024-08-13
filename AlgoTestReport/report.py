@@ -10,7 +10,7 @@ The NITian Algo
 _______________
 Day - {day_number} ({day})
 Capital used: {capital}
-Live Result : Rs. {profit} (including brokerage)
+Live Result : Rs. {profit} (after estimated brokerage deduction)
 Day's ROI : {day_roi} %
 Cumulative ROI: {cum_roi} %
 _______________
