@@ -31,6 +31,7 @@ class Screenshot:
         print("Login init")
         service = Service('/opt/bin/chromedriver')
         self.driver = webdriver.Chrome(service=service, options=self.options)
+        # self.driver = webdriver.Chrome(options=self.options)
         self.driver.get('https://algotest.in/login')
         time.sleep(self.wait_time)
 

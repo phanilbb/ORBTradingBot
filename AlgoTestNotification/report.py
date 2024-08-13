@@ -82,9 +82,9 @@ class Report:
         for month, roi in month_rois.items():
             if roi != 0:
                 if month == current_month_abbr:
-                    self.report_template += f'\n{month.upper()} (ROI) : {roi} % (Running)'
+                    self.report_template += f'\n{month.capitalize()} (ROI) : {roi} % (Running)'
                 else:
-                    self.report_template += f'\n{month.upper()} (ROI) : {roi} %'
+                    self.report_template += f'\n{month.capitalize()} (ROI) : {roi} %'
 
         self.report_template += '\n_______________\n'
 

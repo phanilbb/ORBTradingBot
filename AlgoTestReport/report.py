@@ -8,11 +8,9 @@ import communication
 
 class Report:
     start_row = 2
-    report_template = None
 
     def __init__(self):
-        global r
-        self.report_template = r
+        return
 
     def update(self, event):
         angelOneObj = angel_one.AngelOne(event['angel_one_login_details'])
