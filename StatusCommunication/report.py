@@ -2,9 +2,6 @@ from datetime import datetime
 
 import gspread
 
-import angel_one
-import communication
-
 r = '''
 The NITian Algo
 _______________
