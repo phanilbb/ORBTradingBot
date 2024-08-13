@@ -20,15 +20,11 @@ class Screenshot:
         self.username = data['phone_number']
         self.password = data['password']
         self.options = Options()
-        self.options.binary_location = "/opt/headless-chromium"
         self.options.add_argument("--headless")
-        self.options.add_argument("--no-sandbox")
-        self.options.add_argument("--disable-dev-shm-usage")
-        self.options.add_argument("--single-process")
 
     def init_login(self):
         print("Login init")
-        self.driver = webdriver.Chrome('/opt/chromedriver', chrome_options=self.options)
+        self.driver = webdriver.Chrome(options=self.options)
         self.driver.get('https://algotest.in/login')
         time.sleep(self.wait_time)
 
