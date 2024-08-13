@@ -12,7 +12,7 @@ class Screenshot:
     login_url = 'https://algotest.in/login'
     live_url = 'https://algotest.in/live'
     options = None
-    wait_time = 5
+    wait_time = 10
     driver = None
 
     def __init__(self, data):
@@ -40,10 +40,12 @@ class Screenshot:
         time.sleep(self.wait_time)
 
     def init_live(self):
+        print("Init Live trades")
         self.driver.get('https://algotest.in/live')
         time.sleep(self.wait_time)
 
     def init_mtm_graph(self):
+        print("Init MTM")
         mtm_button = WebDriverWait(self.driver, self.wait_time).until(
             EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'MTM Graph')]"))
         )
@@ -51,6 +53,7 @@ class Screenshot:
         time.sleep(self.wait_time)
 
     def take_screenshot(self, path):
+        print("Taking Screenshot")
         self.driver.set_window_size(1200, 700)
         self.driver.save_screenshot(path)
         self.driver.quit()
