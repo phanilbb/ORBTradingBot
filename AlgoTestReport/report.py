@@ -7,13 +7,13 @@ import communication
 
 r = '''
 The NITian Algo
-_______________
+------------------
 Day - {day_number} ({day})
 Capital used: {capital}
 Live Result : Rs. {profit} (after estimated brokerage deduction)
 Day's ROI : {day_roi} %
 Cumulative ROI: {cum_roi} %
-_______________
+------------------
 '''
 
 
@@ -115,6 +115,6 @@ class Report:
                 else:
                     self.report_template += f'\n{month.capitalize()} (ROI) : {roi} %'
 
-        self.report_template += '\n_______________\n'
+        self.report_template += '\n------------------\n'
 
         return self.report_template
