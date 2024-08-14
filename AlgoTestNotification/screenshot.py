@@ -1,12 +1,11 @@
 import time
 
+import chromedriver_autoinstaller
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
-import os
 
 
 class Screenshot:
@@ -26,16 +25,8 @@ class Screenshot:
 
     def init_login(self):
         print("Login init")
-        current_path = os.getcwd()
-        print("Current working directory:", current_path)
-        chromedriver_path = '{}/chromedriver'.format(current_path)
-        service = Service(chromedriver_path)
-        if os.path.exists(chromedriver_path):
-            message = f"{chromedriver_path} exists."
-        else:
-            message = f"{chromedriver_path} does NOT exist."
-        print(message)
-        self.driver = webdriver.Chrome(service=service, options=self.options)
+        chromedriver_autoinstaller.install(path='/tmp')
+        self.driver = webdriver.Chrome(options=self.options)
         self.driver.get('https://algotest.in/login')
         time.sleep(self.wait_time)
 
