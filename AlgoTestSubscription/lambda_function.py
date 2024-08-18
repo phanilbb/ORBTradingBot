@@ -11,7 +11,7 @@ def lambda_handler(event, context):
     plan_data = algo.get_renew_plans()
     expiration = plan_data.get('expiration') or algo.get_plans().get('expiration')
 
-    if not expiration or time_helper.is_within_days(expiration, -2):
+    if not expiration or time_helper.is_within_days(expiration, 2):
         print("Plan Expired | Subscribing to plans")
         subscribe_plans = algo.renew_plans() or algo.subscribe_plans()
         if subscribe_plans:
