@@ -68,12 +68,13 @@ def get_activate_status(strategy, login_data):
     execution = trade_executions.get(strategy['execute_after'], login_data)
     if not execution or execution['status'] != 'square_off':
         return False
-    profit_loss = calculate_profit_loss(execution['trades'])
-    return profit_loss < 0
+    return execution['status'] == 'square_off'
+    # profit_loss = calculate_profit_loss(execution['trades'])
+    # return profit_loss < 0
 
 
 def activate_strategy(strategy, login_data):
-    del strategy['weekdays']
+    del_unwanted_keys(strategy)
     access_token_cookie = login_data['access_token_cookie']
     csrf_access_token = login_data['csrf_access_token']
     payload = json.dumps(strategy)
@@ -87,6 +88,13 @@ def activate_strategy(strategy, login_data):
     data = r.json()
     print("Activate Strategy : " + json.dumps(data))
     return data
+
+
+def del_unwanted_keys(strategy):
+    if 'weekdays' in strategy:
+        del strategy['weekdays']
+    if 'execute_after' in strategy:
+        del strategy['weekdays']
 
 
 def telegram_bot_sendtext(bot_message):

@@ -6,14 +6,17 @@ import angel_one
 import communication
 
 r = '''
-The NITian Algo
-------------------
+The Algoverse Community
+
+https://t.me/+2naDu-y7Z2JiNWM9
+______________________________
+
 Day - {day_number} ({day})
-Capital used: {capital}
+Base Capital: {capital}
 Live Result : Rs. {profit} (after estimated brokerage deduction)
 Day's ROI : {day_roi} %
 Cumulative ROI: {cum_roi} %
-------------------
+______________________________
 '''
 
 
@@ -115,6 +118,6 @@ class Report:
                 else:
                     self.report_template += f'\n{month.capitalize()} (ROI) : {roi} %'
 
-        self.report_template += '\n------------------\n'
+        self.report_template += '\n______________________________\n'
 
         return self.report_template

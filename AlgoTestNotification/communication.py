@@ -6,8 +6,8 @@ class Communication:
     bot_chatId = None
 
     def __init__(self):
-        self.bot_token = '5945431317:AAFzROpE5IpiuiJyJJyXdCp7prE5-EH7mOg'
-        self.bot_chatId = '1170124746'
+        self.bot_token = '7000080684:AAEE4Rrx_RkfCsB8sLXCyXWyxet2PQBLHKo'
+        self.bot_chatId = '-4594468620'
 
     def send_telegram_msg(self, bot_message):
         send_text = 'https://api.telegram.org/bot' + self.bot_token + '/sendMessage?chat_id=' + self.bot_chatId + '&parse_mode=Markdown&text=' + bot_message

@@ -1,8 +1,6 @@
 import time
 
-import chromedriver_autoinstaller
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
+from headless_chrome import create_driver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -13,20 +11,17 @@ class Screenshot:
     password = None
     login_url = 'https://algotest.in/login'
     live_url = 'https://algotest.in/live'
-    options = None
     wait_time = 10
     driver = None
 
     def __init__(self, data):
         self.username = data['phone_number']
         self.password = data['password']
-        self.options = Options()
-        self.options.add_argument("--headless")
+        return
 
     def init_login(self):
         print("Login init")
-        chromedriver_autoinstaller.install(path='/tmp')
-        self.driver = webdriver.Chrome(options=self.options)
+        self.driver = create_driver()
         self.driver.get('https://algotest.in/login')
         time.sleep(self.wait_time)
 
@@ -59,7 +54,6 @@ class Screenshot:
         print("Taking Screenshot")
         self.driver.set_window_size(1200, 700)
         self.driver.save_screenshot(path)
-        self.driver.quit()
 
     def close(self):
         self.driver.quit()
