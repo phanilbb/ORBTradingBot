@@ -48,12 +48,13 @@ class Report:
         pos = angelOneObj.get_positions()
 
         profit = 0
-        for each in pos['data']:
-            amount = float(each['buyqty']) * (float(each['totalsellavgprice']) - float(each['totalbuyavgprice']))
-            profit += amount
+        if 'data' in pos and pos['data']:
+            for each in pos['data']:
+                amount = float(each['buyqty']) * (float(each['totalsellavgprice']) - float(each['totalbuyavgprice']))
+                profit += amount
 
         order_book = angelOneObj.get_order_book()
-        charges = angelOneObj.get_estimated_charges(order_book, pos)
+        charges = angelOneObj.get_estimated_charges(order_book, pos) if profit else 0
         pnl = profit - charges
 
         now = datetime.now()
@@ -68,7 +69,7 @@ class Report:
         sheet.update_acell(cell_reference, round(pnl, 2))
 
         comm = communication.Communication()
-        if charges == 0:
+        if charges == 0 and profit != 0:
             comm.send_telegram_msg("Estimated charges failed")
 
     def get_text_report(self):
