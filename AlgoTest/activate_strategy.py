@@ -10,9 +10,9 @@ URL = "https://algotest.in/api/execution/start"
 def run(account, result):
     db_data = dynamo_db.get(account['name'])
     activated_strategies = db_data.get('strategies', [])
-    skipped_strategies = db_data.get('skipped_strategies', [])
+    strategies = filter_strategies(account['strategies'])
 
-    if len(account['strategies']) == len(activated_strategies) + len(skipped_strategies):
+    if len(account['strategies']) == len(activated_strategies):
         result['notify'] = False
         return result
 
@@ -20,13 +20,12 @@ def run(account, result):
         return
 
     print("Strategy Activation for account {}".format(account['name']))
-    for each_strategy in account['strategies']:
+    for each_strategy in strategies:
         try:
             if each_strategy['strategy'] not in activated_strategies:
                 login_data = db_data['login_details']
                 activate = get_activate_status(each_strategy, login_data)
                 if not activate:
-                    skipped_strategies.append(each_strategy['strategy'])
                     print("strategy activation skipped")
                     continue
                 data = activate_strategy(each_strategy, login_data)
@@ -42,7 +41,6 @@ def run(account, result):
             result['error'] = "{}' Activation Failed : {}".format(each_strategy['name'], str(e))
         finally:
             db_data['strategies'] = activated_strategies
-            db_data['skipped_strategies'] = skipped_strategies
             dynamo_db.save_item(db_data)
 
 
@@ -57,6 +55,18 @@ def calculate_profit_loss(trades):
                 profit_loss += (sell_trade["TradedPrice"] - buy_trade["TradedPrice"]) * quantity
 
     return profit_loss
+
+
+def filter_strategies(strategies):
+    filtered_strategies = []
+    current_day = time_helper.get_current_day()
+    for strategy in strategies:
+        if 'weekdays' not in strategy:
+            filtered_strategies.append(strategy)
+        if strategy['weekdays'].get(current_day, False):
+            filtered_strategies.append(strategy)
+
+    return filtered_strategies
 
 
 def get_activate_status(strategy, login_data):
@@ -94,7 +104,7 @@ def del_unwanted_keys(strategy):
     if 'weekdays' in strategy:
         del strategy['weekdays']
     if 'execute_after' in strategy:
-        del strategy['weekdays']
+        del strategy['execute_after']
 
 
 def telegram_bot_sendtext(bot_message):
