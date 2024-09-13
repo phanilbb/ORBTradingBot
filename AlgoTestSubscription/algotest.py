@@ -59,9 +59,6 @@ class AlgoTest:
             "plans": {
                 "live_execution": {
                     "max_strategies": 1
-                },
-                "paper_execution": {
-                    "max_strategies": 1
                 }
             }
         }
@@ -77,9 +74,6 @@ class AlgoTest:
         payload = {
             "plans": {
                 "live_execution": {
-                    "max_strategies": 1
-                },
-                "paper_execution": {
                     "max_strategies": 1
                 }
             }
