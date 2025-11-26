@@ -1,7 +1,8 @@
-import time_helper
-import dynamo_db
-from communication import Communication
 import requests
+
+import dynamo_db
+import time_helper
+from communication import Communication
 
 
 def lambda_handler(event, context):
@@ -43,17 +44,26 @@ def lambda_handler(event, context):
         if page_size * page > response['data']['count']:
             break
 
-    tasks_to_notify = []
+    new_pending_tasks = []
+    upcoming_tasks = []
+
     for each_task in tasks:
         if each_task['status'] != 'PENDING':
             continue
+
+        if time_helper.compare_time(each_task['start_time']):
+            upcoming_tasks.append(each_task)
+            continue
+
         task_id = each_task['task_id']
         saved_tasks = dynamo_db.get(task_id)
         if not saved_tasks:
-            tasks_to_notify.append(each_task)
+            new_pending_tasks.append(each_task)
             dynamo_db.save(task_id)
 
-    if tasks_to_notify:
-        comm.send_telegram_msg("{} upcoming pending tasks".format(len(tasks_to_notify)))
+    if upcoming_tasks:
+        comm.send_telegram_msg("You have a call to attend in 5 minutes")
+    if new_pending_tasks:
+        comm.send_telegram_msg("You have {} upcoming new pending tasks".format(len(new_pending_tasks)))
 
     comm.delete_old_messages()
