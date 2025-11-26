@@ -59,11 +59,15 @@ def lambda_handler(event, context):
         saved_tasks = dynamo_db.get(task_id)
         if not saved_tasks:
             new_pending_tasks.append(each_task)
-            dynamo_db.save(task_id)
 
     if upcoming_tasks:
         comm.send_telegram_msg("You have a call to attend in 5 minutes")
-    if new_pending_tasks:
-        comm.send_telegram_msg("You have {} upcoming new pending tasks".format(len(new_pending_tasks)))
+    else:
+        for each_task in new_pending_tasks:
+            task_id = each_task['task_id']
+            dynamo_db.save(task_id)
+
+        if new_pending_tasks:
+            comm.send_telegram_msg("You have {} upcoming new pending tasks".format(len(new_pending_tasks)))
 
     comm.delete_old_messages()
