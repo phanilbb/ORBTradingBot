@@ -1,5 +1,7 @@
-import requests
 import datetime
+import asyncio
+import urllib
+import requests
 
 
 class Communication:
@@ -79,3 +81,9 @@ class Communication:
 
         if last_id:
             requests.get(f"{self.api_url}/getUpdates?offset={last_id}")
+
+    def call(self, message):
+        text = urllib.parse.quote(message)  # Safely encode text for URL
+        url = f"http://api.callmebot.com/start.php?source=auth&user=@liyyus123&text={text}&lang=en-GB-Standard-B"
+        r = requests.get(url, timeout=10)
+        print(r.text)
